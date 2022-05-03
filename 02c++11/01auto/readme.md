@@ -65,18 +65,45 @@ int  main(){
 #include <vector>
 using namespace std;
 int main(){
-    vector< vector<int> > v;
-    vector< vector<int> >::iterator i = v.begin(); //定义迭代器 i 的时候，类型书写比较冗长，容易出错
+    vector<int> v1;
+    vector<int>::iterator i = v.begin(); //定义迭代器 i 的时候，类型书写比较冗长，容易出错
     return 0;
 }
 
-//使用auto简化
+//使用auto简化迭代器定义
+#include <iostream>
 #include <vector>
 using namespace std;
-int main(){
-    vector< vector<int> > v;
-    auto i = v.begin();  //使用 auto 代替具体的类型
-    return 0;
+
+int main()
+{
+    vector<int> v1;
+    v1.push_back(1);
+    v1.push_back(2);
+    v1.push_back(3);
+
+    for(auto ele=v1.begin(); ele!=v1.end(); ele++)       //auto 定义的ele 相当于vector<int>::iterator
+    {
+        cout << *ele << endl; 
+    }
+}
+
+//使用auto简化for循环
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> v1;
+    v1.push_back(1);
+    v1.push_back(2);
+    v1.push_back(3);
+
+    for(auto ele : v1)       //auto 定义的ele 相当于v1中的元素
+    {
+        cout << ele << endl; 
+    }
 }
 
 ```
