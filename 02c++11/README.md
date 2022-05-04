@@ -10,7 +10,7 @@
 
 (5) [tuple 元组](https://github.com/chuanchuan11/cplus/tree/main/02c%2B%2B11/05tuple%20%E5%85%83%E7%BB%84)
 
-(6) []()
+(6) [初始化列表](https://github.com/chuanchuan11/cplus/tree/main/02c%2B%2B11/06%E5%88%9D%E5%A7%8B%E5%8C%96%E5%88%97%E8%A1%A8)
 
 (7) []()
 
