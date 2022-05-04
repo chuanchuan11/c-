@@ -165,6 +165,98 @@ int main()
     return 0;
 }
 
+6. 回调函数中lambda使用局部变量
+#include <iostream>
+#include <functional>
+
+
+using namespace std;
+
+using cb_f = std::function<bool(int, int)>;
+
+class teacher
+{
+public:
+
+    cb_f cb_t = nullptr;
+
+    static teacher& get_instance()
+    {
+        static teacher obj;
+        return obj;
+    }
+
+    teacher()
+    {
+        cout << "teacher construct" << endl;
+    }
+
+    bool cb_test(int a, int b)
+    {
+        cout << "a= " << a << " b= " << b << endl;
+        if(nullptr != cb_t)
+        {
+           cb_t(a, b);
+        }
+        else
+        {
+             cout << "cb is null" << endl;
+        }
+    }
+
+    void set_cb(cb_f cb)
+    {
+        cb_t = cb;
+        if(cb_t != nullptr)
+            cout << "cb " << endl;
+    }
+
+};
+
+class student
+{
+public:
+    static student& get_instance();
+
+    student() : m_name('H'), m_age(29) 
+    {
+        cout << "student construct" << endl;
+    }
+
+    void async_f(char City)
+    {
+        teacher &t1 = teacher::get_instance();
+        //函数调用后，局部变量消失，可以使用值传递方式给导入给回调函数
+        t1.set_cb([this,City](int a, int b) -> bool
+        {
+            cout << "name: " << m_name << " age: " << m_age << " city:" << City << " a: " << a << " b: " << b << endl;
+            return true;
+        });
+
+        cout << "city: " <<  City << endl;
+    }
+
+    char m_name;
+    int m_age;
+    
+};
+student& student::get_instance()
+{
+    static student obj;
+    return obj;
+}
+
+
+int main()
+{
+    student &s1 = student::get_instance();
+    s1.async_f('C');
+
+    teacher &t1 = teacher::get_instance();
+    t1.cb_test(6, 8);
+
+}
+
 ```
 
 参考：
