@@ -44,6 +44,10 @@ lambda匿名函数中的[外部变量]:
 
 ![image](https://user-images.githubusercontent.com/42632290/166631196-94cd4e20-ff69-4005-9ea6-d270a7a42749.png)
 
+[this]捕获当前类中的this指针，让lambda表达式拥有和当前类成员函数同样的访问权限，如果已经使用了&或者=，就默认添加此选项，捕获this的目的是可以在lambda中使用当前类的成员函数和成员变量
+
+
+
 ### (3) lambda表达式使用
 
 ```
@@ -72,6 +76,7 @@ int main()
 {
     //display 即为 lambda 匿名函数的函数名
     auto display = [](int a,int b) -> void{cout << a << " " << b;};
+    //std::function<void(int,int)> display = [](int a,int b) -> void{cout << a << " " << b;};
     //调用 lambda 函数
     display(10,20);
     return 0;
@@ -161,3 +166,7 @@ int main()
 }
 
 ```
+
+参考：
+
+(1) http://c.biancheng.net/view/7818.html
