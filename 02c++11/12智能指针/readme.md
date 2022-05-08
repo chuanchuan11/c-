@@ -25,18 +25,39 @@ double * a3 = nullptr;
 using namespace std;
 ```
 
-
 ### (3) shared_ptr 智能指针
 
+  1) 基本使用
+  
+```  
+  
+``` 
 
-  
-  
-  
-  
-  
-  
-  
+  2) 模板类提供的成员方法
 
+```
+  
+```
+  
+  3) 使用陷阱
+
+```
+  
+```
+  
+  4) 多线程使用
+ 
+```
+  
+```
+
+参考：
+  
+(1) https://blog.csdn.net/Dorothy_yy/article/details/121446118
+  
+(2) http://m.biancheng.net/view/7898.html
+  
+  
 ### (4) unique_ptr 智能指针
 
 
