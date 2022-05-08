@@ -140,5 +140,9 @@ int& && forward(int& &param){
   引用折叠一下就是 int &类型，转发正确
 ```
 
+参考：
 
+(1) https://zhuanlan.zhihu.com/p/398817111
+
+(2) http://c.biancheng.net/view/7868.html
 
