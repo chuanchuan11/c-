@@ -206,9 +206,12 @@ shared_ptr的线程安全级别：
 
 ```
 //1. 独占所指向的对象,通过函数返回给其他的unique_ptr，或者用std::move转移到其他的unique_ptr
-     unique_ptr<int> p(new int);
+     unique_ptr<int> p(new int);        // OK，正常初始化
      unique_ptr<int> p1 = p;            // 错误，unique_ptr不允许复制
-     unique_ptr<int> p2 = std::move(p); // OK
+     unique_ptr<int> p2 = std::move(p); // OK，移动语义初始化
+     unique_ptr<int> p3 = unique_ptr<int>(new int(1));  //OK，使用匿名对象初始化
+    
+     注意：C++11中没有，C++14中才有make_unique
 	
 //2. unique_ptr可以指向一个数组
      unique_ptr<int []> ptr(new int[10])    //ok, 可以直接指定数组
@@ -300,14 +303,34 @@ shared_ptr的线程安全级别：
   0) wake_ptr 的定义
 
 ```	
-	
+    weak_ptr 定位为智能指针的一种，但该类型指针通常不单独使用（没有实际用处），只能和 shared_ptr 类型指针搭配使用。
+
+    需要注意的是，当 weak_ptr 类型指针的指向和某一 shared_ptr 指针相同时，weak_ptr 指针并不会使所指堆内存的引用计数加 1；同样，当 weak_ptr 指针被释放时，之前所指堆内存的引用计数也不会因此而减 1。也就是说，weak_ptr 类型指针并不会影响所指堆内存空间的引用计数。
+
+    除此之外，weak_ptr<T> 模板类中没有重载 * 和 -> 运算符，这也就意味着，weak_ptr 类型指针只能访问所指的堆内存，而无法修改它
 ```	
-	
-	
+		
   1) 基本使用
+
+```
+1. weak_ptr 指针的创建 
+    std::shared_ptr<int> sp = make_shared<int>(1);  //创建一个shared_ptr指针
+    std::weak_ptr<int> wp1 (sp);    //OK, 用shared_ptr来初始化
+    std::weak_ptr<int> wp2(sp1);    //OK, 用已有的weak_ptr指针，来初始化
 	
+	
+	
+	
+	
+```
+
   2) 模板类提供的成员方法
-	
+
+
+```
+ 	
+```
+
   3) 使用陷阱
 	
   4) 多线程使用
