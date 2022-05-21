@@ -318,19 +318,65 @@ shared_ptr的线程安全级别：
     std::weak_ptr<int> wp1 (sp);    //OK, 用shared_ptr来初始化
     std::weak_ptr<int> wp2(sp1);    //OK, 用已有的weak_ptr指针，来初始化
 	
-	
-	
-	
-	
 ```
 
   2) 模板类提供的成员方法
 
+![image](https://user-images.githubusercontent.com/42632290/169649754-5874fdd4-ab5e-42fb-a0b6-b1bb604e69fd.png)
 
 ```
- 	
-```
+示例：
+#include <iostream>
+#include <memory>
+using namespace std;
+int main()
+{
+    //1. 创建weak_ptr
+    std::shared_ptr<int> sp1(new int(10));
+    std::shared_ptr<int> sp2(sp1);
+    std::weak_ptr<int> wp(sp2);
 
-  3) 使用陷阱
+    cout << wp.use_count() << endl; // result: 2 输出和wp同指向的 shared_ptr 类型指针的数量
+
+    //2. 释放 sp2
+    sp2.reset();
+    cout << wp.use_count() << endl; //result: 1 
+
+    
+    //3. 借助 lock() 函数，返回一个和 wp 同指向的 shared_ptr 类型指针，获取其存储的数据
+    cout << *(wp.lock()) << endl;  //result: 10
+    return 0;
 	
-  4) 多线程使用
+    //4. expired 判断所观测到资源是否已经被释放，即：强引用所指向的对象还存在表示未过期
+    if(wp.expired())
+	cout << "该weak_ptr所指向的资源已经被释放了" << endl;
+
+}
+
+```
+
+  3) 解决循环引用问题
+
+```
+// 用weak_ptr解决循环引用问题，具体方法是将A或B类中，shared_ptr类型修改为weak_ptr
+
+struct A;
+struct B;
+
+struct A {
+	shared_ptr<B> bptr;
+	~A() { cout << "A is deleted" << endl; }
+};
+
+struct B {
+	weak_ptr<A> aptr; // 将B中指向A对象的智能指针，由shared_ptr修改为weak_ptr
+	~B() { cout << "B is deleted" << endl; }
+};
+
+void test() {
+	shared_ptr<A> pa(new A);
+	shared_ptr<B> pb(new B);
+	pa->bptr = pb;
+	pb->aptr = pa;
+} // OK
+```
