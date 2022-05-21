@@ -22,7 +22,7 @@
 
 (11) [完美转发](https://github.com/chuanchuan11/cplus/tree/main/02c%2B%2B11/11%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91)
 
-(12) []()
+(12) [智能指针](https://github.com/chuanchuan11/cplus/tree/main/02c%2B%2B11/12%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88)
 
 (13) []()
 
