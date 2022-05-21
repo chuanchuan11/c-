@@ -380,3 +380,11 @@ void test() {
 	pb->aptr = pa;
 } // OK
 ```
+
+参考：
+
+(1) https://blog.csdn.net/weixin_44980842/article/details/121828485
+	
+(2) http://c.biancheng.net/view/7918.html
+	
+(3) https://blog.csdn.net/Dorothy_yy/article/details/121446118
