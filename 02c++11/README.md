@@ -24,9 +24,9 @@
 
 (12) [智能指针](https://github.com/chuanchuan11/cplus/tree/main/02c%2B%2B11/12%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88)
 
-(13) []()
+(13) [std::function and std::bind](https://github.com/chuanchuan11/cplus/tree/main/02c%2B%2B11/14std::function_and_std::bind)
 
-(14) []()
+(14) [c++11线程并发]()
 
 (15) []()
 
