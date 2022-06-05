@@ -433,6 +433,35 @@ int main()
 3. 删
 
 4. 改
+
+```
+a) []运算符修改值
+             
+    std::map<string, string> mymap;
+    //借用 operator[] 添加新键值对
+    mymap["STL教程"] = "http://www.cdsy.xyz/computer/programme/java/";
+    cout << "old mymap：" << mymap["STL教程"] << endl;
+
+    //借用 operator[] 更新某个键对应的值
+    mymap["STL教程"] = "http://www.cdsy.xyz/computer/programme/stl/";
+    cout << "new mymap：" << mymap["STL教程"] << endl;
+             
+b) insert函数修改值
+             
+    //借用insert()添加新键值对
+    std::pair<string, string> STL = { "Java教程","http://www.cdsy.xyz/computer/programme/Python/" };
+    std::pair<std::map<string, string>::iterator, bool> ret;
+    ret = mymap.insert(STL);
+    cout << "old ret.iter = <{" << ret.first->first << ", " << ret.first->second << "}, " << ret.second << ">" << endl;
+
+    //借用 insert() 更新键值对
+    mymap.insert(STL).first->second = "http://www.cdsy.xyz/computer/programme/java/";
+    cout << "new ret.iter = <" << ret.first->first << ", " << ret.first->second << ">" << endl;
+    return 0;
+             
+注意：
+     向 map 容器中添加新键值对元素的操作时，insert() 成员方法的执行效率更高；而在实现更新 map 容器指定键值对的值的操作时，operator[ ] 的效率更高       
+```
              
 5. 查
          
@@ -570,7 +599,15 @@ f) 遍历查找
 
 (4) 插入方法效率对比
 
-
+    使用 insert() 向 map 容器中插入键值对的过程是，先创建该键值对，然后再将该键值对复制或者移动到 map 容器中的指定位置；
+             
+    使用 emplace() 或 emplace_hint() 插入键值对的过程是，直接在 map 容器中的指定位置构造该键值对。
+             
+    也就是说，向 map 容器中插入键值对时，emplace() 和 emplace_hint() 方法都省略了移动键值对的过程，因此执行效率更高。
+             
+详细参考：
+             
+(1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510781911997.html
 
 ##### 3. set容器
 
