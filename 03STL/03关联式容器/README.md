@@ -609,12 +609,27 @@ f) 遍历查找
              
 (1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510781911997.html
 
-##### 3. set容器
 
+##### 3. multimap容器             
+ 
+(1) 概述
 
+  multimap 容器具有和 map 相同的特性，和 map 容器的区别在于，multimap 容器中可以同时存储多（≥2）个键相同的键值对。
+ 
+(2) 常用成员函数
 
+    multimap的常用成员函数和map基本一致，除了下列:
+             
+```
+1. 头文件：#include <map>
+             
+2. multimap 未提供 at() 成员方法，也没有重载 [] 运算符。因为 multimap 容器中指定的键可能对应多个键值对，而不再是 1 个。    
+             
+3. find 函数查找首个键为 key 的键值对，如果成功找到，则返回指向该键值对的双向迭代器；反之，则返回和 end() 方法一样的迭代器         
+```
+             
+##### 4. set容器
 
-##### 4. multimap容器
 
 
 
