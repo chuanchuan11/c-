@@ -635,17 +635,114 @@ f) 遍历查找
 ##### 4. set容器
 
 (0) 概述
+
+  map/multimap 容器不同,使用**set容器存储的各个键值对, 要求键 key 和值 value 必须相等**
              
+```
+例如：
+  {<'a', 1>, <'b', 2>, <'c', 3>}
+  {<'a', 'a'>, <'b', 'b'>, <'c', 'c'>}  
+
+  第一组数据中各键值对的键和值不相等，而第二组中各键值对的键和值对应相等。对于 set 容器来说，只能存储第 2 组键值对，而无法存储第一组键值对.
+```
+
+  基于 set 容器的这种特性，当使用 set 容器存储键值对时，只需要为其提供各键值对中的 value 值（也就是 key 的值）即可。以存储上面第 2 组键值对为例，只需要为 set 容器提供 {'a','b','c'} ，该容器即可成功将它们存储起来
+
+  set 容器也会根据 key 排序，也就等价为根据 value 排序，默认为升序排序
+
+  set 容器并没有强制对存储元素的类型做 const 修饰。但是，C++ 标准为了防止用户修改容器中元素的值，对所有可能会实现此操作的行为做了限制，使得在正常情况下，用户是无法做到修改 set 容器中元素的值的。切勿尝试直接修改 set 容器中已存储元素的值，这很有可能破坏 set 容器中元素的有序性，最正确的修改 set 容器中元素值的做法是：**先删除该元素，然后再添加一个修改后的元素**
+             
+```
+1. 头文件 #include <set>
+          using namespace std;
+             
+2. 类模板定义
+template < class T,                        // 键 key 和值 value 的类型
+           class Compare = less<T>,        // 指定 set 容器内部的排序规则
+           class Alloc = allocator<T>      // 指定分配器对象的类型
+           > class set;
+             
+  注意：由于 set 容器存储的各个键值对，其键和值完全相同，因此 set 容器类模板的定义中，仅有第 1 个参数用于设定存储数据的类型。
+对于 set 类模板中的 3 个参数，后 2 个参数自带默认值，且几乎所有场景中只需使用前 2 个参数，第 3 个参数不会用到
+```
+
 (1) 创建
 
-(2) 常见成员函数
+```
+1. 使用默认构造函数
+   std::set<std::string> myset;  //空set容器
              
+2. 创建 set 容器的同时，对其进行初始化        
+   std::set<std::string> myset{"http://www.cdsy.xyz/computer/programme/java/",
+                               "http://www.cdsy.xyz/computer/programme/stl/",
+                               "http://www.cdsy.xyz/computer/programme/Python/"};
+
+3. 拷贝（复制）构造函数       
+   std::set<std::string> copyset(myset);  //等同于std::set<std::string> copyset = myset
+                                          //将已有 set 容器中存储的所有元素全部复制到新 set 容器中
+             
+4. 移动构造函数
+   set<string> retSet() {
+   std::set<std::string> myset{ "http://www.cdsy.xyz/computer/programme/java/",
+                                "http://www.cdsy.xyz/computer/programme/stl/",
+                                "http://www.cdsy.xyz/computer/programme/Python/" };
+    return myset;
+   }
+   std::set<std::string> copyset(retSet());     // 等同于 std::set<std::string> copyset = retSet();   
+                                                // 利用临时的 set 容器初始化新建对象
+
+5. 取已有 set 容器中的部分元素，来初始化新 set 容器
+   std::set<std::string> myset{ "http://www.cdsy.xyz/computer/programme/java/",
+                                "http://www.cdsy.xyz/computer/programme/stl/",
+                                "http://www.cdsy.xyz/computer/programme/Python/" };
+    std::set<std::string> copyset(++myset.begin(), myset.end());
+             
+6. 手动修改 set 容器中的排序规则
+   std::set<std::string,std::greater<string> > myset{"http://www.cdsy.xyz/computer/programme/java/",
+                                                     "http://www.cdsy.xyz/computer/programme/stl/",
+                                                     "http://www.cdsy.xyz/computer/programme/Python/"};
+   std::greater<string>降序规则，输出：
+                                      "http://www.cdsy.xyz/computer/programme/stl/"
+                                      "http://www.cdsy.xyz/computer/programme/Python/"
+                                      "http://www.cdsy.xyz/computer/programme/java/"
+             
+             
+```
+
+(2) 常见成员函数
+
+![image](https://user-images.githubusercontent.com/42632290/175796439-2909223b-89b7-4605-82d0-11c20b98b61c.png)
+![image](https://user-images.githubusercontent.com/42632290/175796451-d3f09570-d943-48ab-a7f2-6327fbd20836.png)
+
+  注意：以上成员函数返回的迭代器，指向的只是 set 容器中存储的元素，而不再是键值对。另外，以上成员方法返回的迭代器，无论是 const 类型还是非 const 类型，都不能用于修改 set 容器中的值
+
 (3) 迭代器使用详解
+
+   set 容器类模板中未提供 at() 成员函数，也未对 [] 运算符进行重载。因此，要想访问 set 容器中存储的元素，只能借助 set 容器的迭代器
+   
+   C++ STL 标准库为 set 容器配置的迭代器类型为双向迭代器。这意味着其只能进行 ++p、p++、--p、p--、*p 操作，并且 2 个双向迭代器之间做比较，也只能使用 == 或者 != 运算符
 
 1. 遍历
 
 ```
-             
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main()
+{
+    //创建并初始化set容器
+    std::set<std::string> myset{ "http://www.cdsy.xyz/computer/programme/java/",
+                                 "http://www.cdsy.xyz/computer/programme/stl/",
+                                 "http://www.cdsy.xyz/computer/programme/Python/"
+    };
+    //利用双向迭代器，遍历myset
+    for (auto iter = myset.begin(); iter != myset.end(); ++iter) {
+        cout << *iter << endl;  // iter 指向的是 set 容器存储的某个元素，而不是键值对，因此通过 *iter 可以直接获取该迭代器指向的元素的值
+    }
+    return 0;
+}
 ```       
 
 2. 增
