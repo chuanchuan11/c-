@@ -748,6 +748,146 @@ int main()
 2. 增
 
 ```
+a) insert 函数：该方式会破坏容器内部的有序状态，set 容器还会自行对新元素的位置做进一步调整
+             
+   方法1：给定目标元素的值，添加到 set 容器中     
+          pair<iterator,bool> insert (const value_type& val); //普通引用方式传参
+          pair<iterator,bool> insert (value_type&& val);      //右值引用方式传参
+             
+        成功：该迭代器指向 set 容器新添加的元素，bool 类型的值为 true；
+        失败：即证明原 set 容器中已存有相同的元素，此时返回的迭代器就指向容器中相同的此元素，同时 bool 类型的值为 false。
+
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main()
+{
+    //创建并初始化set容器
+    std::set<std::string> myset;
+    //准备接受 insert() 的返回值
+    pair<set<string>::iterator, bool> retpair;
+    //采用普通引用传值方式
+    string str = "http://www.cdsy.xyz/computer/programme/stl/";
+    retpair = myset.insert(str);
+    cout << "iter->" << *(retpair.first) << " " << "bool = " << retpair.second << endl;
+    //采用右值引用传值方式
+    retpair = myset.insert("http://www.cdsy.xyz/computer/programme/Python/");
+    cout << "iter->" << *(retpair.first) << " " << "bool = " << retpair.second << endl;
+    return 0;
+}
+             
+输出：
+      ter->http://www.cdsy.xyz/computer/programme/stl/ bool = 1
+      iter->http://www.cdsy.xyz/computer/programme/Python/ bool = 1       
+
+             
+  方法2： 指定将新元素插入到 set 容器中的具体位置            
+          iterator insert (const_iterator position, const value_type& val);  //以普通引用的方式传递 val 值
+          iterator insert (const_iterator position, value_type&& val);       //以右值引用的方式传递 val 值
+
+      成功：当向 set 容器添加元素成功时，该迭代器指向容器中新添加的元素；
+      失败：当添加失败时，证明原 set 容器中已有相同的元素，该迭代器就指向 set 容器中相同的这个元素
+
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main()
+{
+    //创建并初始化set容器
+    std::set<std::string> myset;
+    //准备接受 insert() 的返回值
+    set<string>::iterator iter;
+
+    //采用普通引用传值方式
+    string str = "http://www.cdsy.xyz/computer/programme/stl/";
+    iter = myset.insert(myset.begin(),str);
+    cout << "myset size =" << myset.size() << endl;
+
+    //采用右值引用传值方式
+    iter = myset.insert(myset.end(),"http://www.cdsy.xyz/computer/programme/Python/");
+    cout << "myset size =" << myset.size() << endl;
+    return 0;
+}  
+
+输出：
+     myset size =1
+     myset size =2
+
+
+    方法3：向当前 set 容器中插入其它 set 容器指定区域内的所有元素
+           template <class InputIterator>
+           void insert (InputIterator first, InputIterator last);
+             
+        注意：first 和 last 都是迭代器，它们的组合 [first,last) 可以表示另一 set 容器中的一块区域，该区域包括 first 迭代器指向的元素，但不包含 last 迭代器指向的元素
+
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main()
+{
+    //创建并初始化set容器
+    std::set<std::string> myset{ "http://www.cdsy.xyz/computer/programme/stl/",
+                                "http://www.cdsy.xyz/computer/programme/Python/",
+                                "http://www.cdsy.xyz/computer/programme/java/" };
+    //创建一个同类型的空 set 容器
+    std::set<std::string> otherset;
+    //利用 myset 初始化 otherset
+    otherset.insert(++myset.begin(), myset.end());
+    //输出 otherset 容器中的元素
+    for (auto iter = otherset.begin(); iter != otherset.end(); ++iter) {
+        cout << *iter << endl;
+    }
+    return 0;
+}
+             
+输出：
+     http://www.cdsy.xyz/computer/programme/Python/
+     http://www.cdsy.xyz/computer/programme/stl/
+             
+     
+    方法4：实现一次向 set 容器中添加多个元素
+           void insert ( {E1, E2,...,En} );  //其中，Ei 表示新添加的元素
+             
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main()
+{
+    //创建并初始化set容器
+    std::set<std::string> myset;
+    //向 myset 中添加多个元素
+    myset.insert({ "http://www.cdsy.xyz/computer/programme/stl/",
+        "http://www.cdsy.xyz/computer/programme/Python/",
+        "http://www.cdsy.xyz/computer/programme/java/" });
+
+    for (auto iter = myset.begin(); iter != myset.end(); ++iter) {
+        cout << *iter << endl;
+    }
+    return 0;
+}
+             
+输出：
+      http://www.cdsy.xyz/computer/programme/java/
+      http://www.cdsy.xyz/computer/programme/Python/
+      http://www.cdsy.xyz/computer/programme/stl/ 
+             
+
+b) 
+             
+             
+             
              
 ```       
 
