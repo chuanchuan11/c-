@@ -1084,13 +1084,129 @@ int main() {
        (1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510782712004.html
              
 ##### 6. 自定义关联式容器的排序规则   
+  
+  为关联式容器自定义排序规则，有以下 2 种方法：
              
+```  
+ 1) 使用函数对象自定义排序规则
              
+    无论关联式容器中存储的是基础类型（如 int、double、float 等）数据，还是自定义的结构体变量或类对象（包括 string 类），都可以使用函数对象的方式为该容器自定义排序规则.
              
+示例：
+#include <iostream>
+#include <set>          // set
+#include <string>       // string
+using namespace std;
              
+//定义函数对象类
+class cmp {
+public:
+    bool operator ()(const string &a,const string &b)    //重载 () 运算符
+    {
+        return  (a.length() < b.length());               //按照字符串的长度，做升序排序(即存储的字符串从短到长)
+    }                                                    //由于是以字符串的长度为准进行排序，因此其无法存储相同长度的多个字符串。
+};
+                                          
+int main() {
+    //创建 set 容器，并使用自定义的 cmp 排序规则
+    std::set<string, cmp>myset{"http://www.cdsy.xyz/computer/programme/stl/",
+                               "http://www.cdsy.xyz/computer/programme/Python/",
+                               "http://www.cdsy.xyz/computer/programme/java/"};
+    //输出容器中存储的元素
+    for (auto iter = myset.begin(); iter != myset.end(); ++iter) {
+            cout << *iter << endl;
+    }
+    return 0;
+}
+             
+输出：
+     http://www.cdsy.xyz/computer/programme/stl/
+     http://www.cdsy.xyz/computer/programme/java/
+     http://www.cdsy.xyz/computer/programme/Python/
+             
+//也可以定义函数对象模板类
+template <typename T>
+class cmp {
+public:
+    bool operator ()(const T &a, const T &b)       //重载 () 运算符
+    {
+        return  a < b;                             //按照值的大小，做升序排序
+    }
+};
+
+```
+
+2) 重载关系运算符实现自定义排序
+
+   其实在 STL 标准库中，本就包含几个可供关联式容器使用的排序规则，如表 1 表示:
+
+![image](https://user-images.githubusercontent.com/42632290/175803401-71fc2311-9011-483f-9471-866b2478dcbf.png)
+               
+   在此基础上，当关联式容器中存储的数据类型为自定义的结构体变量或者类对象时，通过对现有排序规则中所用的关系运算符进行重载，也能实现自定义排序规则的目的             
+                   
+**注意，当关联式容器中存储的元素类型为结构体指针变量或者类的指针对象时，只能使用函数对象的方式自定义排序规则，此方法不再适用**
+
+```
+#include <iostream>
+#include <set>          // set
+#include <string>       // string
+using namespace std;
+//自定义类
+class myString {
+public:
+    myString(string tempStr) :str(tempStr) {};  //定义构造函数，向 myset 容器中添加元素时会用到
+    
+    string getStr() const;  //获取 str 私有对象，由于会被私有对象调用，因此该成员方法也必须为 const 类型
+private:
+    string str;
+};
+string myString::getStr() const{
+    return this->str;
+}
+             
+bool operator <(const myString &stra, const myString & strb) //重载 < 运算符，参数必须都为 const 类型
+{
+    return stra.getStr().length() < strb.getStr().length();  //以字符串的长度为标准比较大小
+}
+
+int main() {
+    //创建空 set 容器，仍使用默认的 less<T> 排序规则
+    std::set<myString>myset;
+
+    //向 set 容器添加元素，这里会调用 myString 类的构造函数
+    myset.emplace("http://www.cdsy.xyz/computer/programme/stl/");
+    myset.emplace("http://www.cdsy.xyz/computer/programme/C_language/");
+    myset.emplace("http://www.cdsy.xyz/computer/programme/Python/");
+
+    for (auto iter = myset.begin(); iter != myset.end(); ++iter) 
+    {
+        myString mystr = *iter;
+        cout << mystr.getStr() << endl;
+    }
+    return 0;
+}
+             
+输出结果：
+        http://www.cdsy.xyz/computer/programme/C_language/
+        http://www.cdsy.xyz/computer/programme/Python/
+        http://www.cdsy.xyz/computer/programme/stl/
+
+        虽然 myset 容器表面仍采用默认的 std::less<T> 排序规则，但由于我们对其所用的 < 运算符进行了重载，使得 myset 容器内部实则是以字符串的长度为基准，对各个 mystring 类对象进行排序
+
+
+```
+
 ##### 7. 修改关联式容器中键值对的键
              
+  对于如何修改容器中某个键值对的键，所有关联式容器可以采用同一种解决思路，即**先删除该键值对，然后再向容器中添加修改之后的新键值对**
              
+  是否可以不删除目标键值对，而直接修改它的键呢？           
+  
+       C++ STL 标准中明确规定, **map 和 multimap 容器**用于存储类型为 pair<const K, V> 的键值对。显然，只要目标键值对存储在当前容器中，键的值就无法被修改
              
+       使用 const_cast 能直接修改 set 或者 multiset 容器中的元素，但一定不要修改元素的键！如果要修改，只能采用“先删除，再添加”的方式
+
+参考：
              
-             
+(1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510782912006.html
+
