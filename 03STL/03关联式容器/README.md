@@ -884,17 +884,142 @@ int main()
       http://www.cdsy.xyz/computer/programme/stl/ 
              
 
-b) 
+b) emplace(): 返回值类型为 pair 类型，其包含 2 个元素，一个迭代器和一个 bool 值：
+             
+        template <class... Args>
+        pair<iterator,bool> emplace (Args&&... args);   //构造新结构体变量（或者类对象）需要多少个数据，就需要为该方法传入相应个数的数据
+
+    成功：返回的迭代器指向新插入的元素，同时 bool 值为 true；
+    失败：表明原 set 容器中已存在相同值的元素，此时返回的迭代器指向容器中具有相同键的这个元素，同时 bool 值为 false。
+             
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+int main()
+{
+    //创建并初始化 set 容器
+    std::set<string>myset;
+    //向 myset 容器中添加元素
+    pair<set<string, string>::iterator, bool> ret = myset.emplace("http://www.cdsy.xyz/computer/programme/stl/");
+    cout << "myset size = " << myset.size() << endl;
+    cout << "ret.iter = <" << *(ret.first) << ", " << ret.second << ">" << endl;
+    return 0;
+}
+
+输出：
+    myset size = 1
+    ret.iter = <http://www.cdsy.xyz/computer/programme/stl/, 1>
              
              
+c) emplace_hint(): 需要额外传入一个迭代器，用来指明新元素添加到 set 容器的具体位置（新元素会添加到该迭代器指向元素的前面）
              
+     template <class... Args>
+     iterator emplace_hint (const_iterator position, Args&&... args);
              
+     成功: 返回的迭代器指向新添加的元素
+     失败: 则迭代器就指向 set 容器和要添加元素的值相同的元素        
+
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+int main()
+{
+    //创建并初始化 set 容器
+    std::set<string>myset;
+    //在 set 容器的指定位置添加键值对
+    set<string>::iterator iter = myset.emplace_hint(myset.begin(), "http://www.cdsy.xyz/computer/programme/stl/");
+    cout << "myset size = " << myset.size() << endl;
+    cout << *iter << endl;
+    return 0;
+}
+             
+输出：
+     myset size = 1
+     http://www.cdsy.xyz/computer/programme/stl/
+
+             
+注意：虽然能在指定位置插入新元素，但set 容器为了保持数据的有序状态，可能会移动其位置
 ```       
 
 3. 删
 
 ```
+a) erase(): 删除指定的元素
              
+   方法1：  
+         size_type erase (const value_type& val);    //删除 set 容器中值为 val 的元素
+   方法2：
+         iterator  erase (const_iterator position);  //删除 position 迭代器指向的元素
+   方法3：                     
+         iterator  erase (const_iterator first, const_iterator last);  //删除 [first,last) 区间内的所有元素
+
+   注意：
+         1) 第 1 种 erase方法，其返回值为一个整数，表示成功删除的元素个数；后 2 种格式的 erase方法，返回值都是迭代器，其指向的是 set 容器中删除元素之后的第一个元素。
+         2) 如果要删除的元素就是 set 容器最后一个元素，则 erase方法返回的迭代器就指向新 set 容器中最后一个元素之后的位置（等价于 end() 方法返回的迭代器）
+             
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+int main()
+{
+    //创建并初始化 set 容器
+    std::set<int>myset{1,2,3,4,5};
+    cout << "myset size = " << myset.size() << endl;
+   
+    //1) 调用第一种格式的 erase() 方法
+    int num = myset.erase(2); //删除元素 2，myset={1,3,4,5}
+    cout << "1、myset size = " << myset.size() << endl;
+    cout << "num = " << num << endl;
+
+    //2) 调用第二种格式的 erase() 方法
+    set<int>::iterator iter = myset.erase(myset.begin()); //删除元素 1，myset={3,4,5}
+    cout << "2、myset size = " << myset.size() << endl;
+    cout << "iter->" << *iter << endl;
+
+    //3) 调用第三种格式的 erase() 方法
+    set<int>::iterator iter2 = myset.erase(myset.begin(), --myset.end());//删除元素 3,4，myset={5}
+    cout << "3、myset size = " << myset.size() << endl;
+    cout << "iter2->" << *iter2 << endl;
+    return 0;
+}
+             
+输出：
+     myset size = 5
+     1、myset size = 4
+        num = 1
+     2、myset size = 3
+        iter->3
+     3、myset size = 1
+        iter2->5
+             
+             
+b) clear: 删除 set 容器中存储的所有元素, 不需要传入任何参数，也没有任何返回值
+
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+int main()
+{
+    //创建并初始化 set 容器
+    std::set<int>myset{1,2,3,4,5};
+    cout << "1、myset size = " << myset.size() << endl;
+    //清空 myset 容器
+    myset.clear();
+    cout << "2、myset size = " << myset.size() << endl;
+    return 0;
+}
+             
+输出：
+    1、myset size = 5
+    2、myset size = 0   
 ```         
              
  4. 改
@@ -914,39 +1039,48 @@ b)
 
 (0) 概述
              
-(1) 创建
+    multiset 容器和 set 容器唯一的差别在于，multiset 容器允许存储多个值相同的元素，而 set 容器中只能存储互不相同的元素
 
-(2) 常见成员函数
+(1) 常见成员函数
              
-(3) 迭代器使用详解
+```
+1. 头文件
+        #include <set>
+        using namespace std;
+             
+2.multiset 容器和 set 容器拥有的成员方法完全相同，但由于 multiset 容器允许存储多个值相同的元素，因此诸如 count()、find()、lower_bound()、upper_bound()、equal_range()等方法，更常用于 multiset 容器
+             
+示例：
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
 
-1. 遍历
-
+int main() {
+    std::multiset<int> mymultiset{1,2,2,2,3,4,5};
+    cout << "multiset size = " << mymultiset.size() << endl;
+    cout << "multiset count(2) =" << mymultiset.count(2) << endl;
+    //向容器中添加元素 8
+    mymultiset.insert(8);
+    //删除容器中所有值为 2 的元素
+    int num = mymultiset.erase(2);
+    cout << "删除了 " << num << " 个元素 2" << endl;
+    //输出容器中存储的所有元素
+    for (auto iter = mymultiset.begin(); iter != mymultiset.end(); ++iter) {
+        cout << *iter << " ";
+    }
+    return 0;
+}
+             
+输出：
+     multiset size = 7
+     multiset count(2) =3
+     删除了 3 个元素 2
+     1 3 4 5 8         
 ```
              
-```       
-
-2. 增
-
-```
+具体函数参考：
              
-```       
-
-3. 删
-
-```
+       (1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510782712004.html
              
-```         
              
- 4. 改
-
-```
-             
-```              
-  
- 5. 查
-
-```
-             
-```  
-
