@@ -24,17 +24,83 @@ forward_list<T>（正向链表容器）：和 list 容器类似，只不过它�
 ##### 1. array容器
 
 (0) 概述
-             
+    
+  array 容器是 C++ 11 标准中新增的序列容器，简单地理解，它就是在 C++ 普通数组的基础上，添加了一些成员函数和全局函数。在使用上，它比普通数组更安全（原因后续会讲），且效率并没有因此变差。
+
+  array 容器的大小是固定的，无法动态的扩展或收缩，这也就意味着，在使用过程中无法通过增加或移除元素而改变其大小，**只允许访问或者替换存储的元素**。
+
+```
+1. 头文件  <array> 
+
+    #include <array>
+    using namespace std;
+
+2. array 容器以类模板的形式定义
+
+   namespace std{
+        template <typename T, size_t N>
+        class array;
+   }
+
+   注意：array<T,N> 类模板中，T 用于指明容器中的存储的具体数据类型，N 用于指明容器的大小. 这里的 N 必须是常量，不能用变量表示
+
+```
+
 (1) 创建
 
+```
+a) 直接创建
+    std::array<double, 10> values;    //各个元素的值是不确定的，array 容器不会做默认初始化操作
+    
+b) 创建并使用默认初始化为0    
+    std::array<double, 10> values {}; //所有的元素被初始化为 0.0
+    
+c) 创建并自定义初始化值  
+    std::array<double, 10> values {0.5,1.0,1.5,,2.0};  //只初始化前 4 个元素，剩余的元素都会被初始化为 0.0
+    
+```
+
 (2) 常见成员函数
-             
+
+![image](https://user-images.githubusercontent.com/42632290/177032011-4e8646ef-b25f-46c5-9cf7-ee4277a0b6c9.png)
+
+    另外，在 <array> 头文件中还重载了 get() 全局函数，该重载函数的功能是访问容器中指定的元素，并返回该元素的引用。
+
+    **正是由于 array 容器中包含了 at() 这样的成员函数，使得操作元素时比普通数组更安全**
+
+
+
 (3) 迭代器使用详解
 
 1. 遍历
 
 ```
-             
+#include <iostream>
+#include <array>
+using namespace std;
+
+int main()
+{
+    std::array<int, 4> values{};  //初始化 values 容器为 {0,1,2,3}
+    
+    for (int i = 0; i < values.size(); i++) {
+        values.at(i) = i;  //使用at赋值
+    }
+    
+    cout << get<3>(values) << endl;  //使用 get() 重载函数输出指定位置元素
+    
+    if (!values.empty()) {   //如果容器不为空，则输出容器中所有的元素
+        for (auto val = values.begin(); val < values.end(); val++) 
+        {
+            cout << *val << " ";
+        }
+    }
+}
+
+输出：
+    3
+    0 1 2 3
+
 ```       
 
 2. 增
