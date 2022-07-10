@@ -106,27 +106,112 @@ int main()
 2. 增
 
 ```
-             
+  不支持      
 ```       
 
 3. 删
 
 ```
-             
+  不支持          
 ```         
              
  4. 改
 
 ```
-             
+a) at 函数
+b) []
+c) data 函数
 ```              
   
  5. 查
 
 ```
-             
+a) []方法：该方式没有边界检查，即使越界访问，也不会被检测到
+
+    values[4] = values[3] + 2.O*values[1];
+    
+b) at() 成员函数访问元素：索引越界时，程序会抛出 std::out_of_range 异常，更安全，推荐使用
+
+    values.at (4) = values.at(3) + 2.O*values.at(1);
+
+c) get<n> 模板函数: 参数实参必须是在编译时可以确定的常量表达式，所以它不能是一个循环变量
+
+    #include <iostream>
+    #include <array>
+    #include <string>
+    using namespace std;
+    int main()
+    {
+        array<string, 5> words{ "one","two","three","four","five" };
+        cout << get<3>(words) << endl;        // 输出：four
+        //cout << get<6>(words) << std::endl; // 越界，会发生编译错误
+        return 0;
+    }
+    
+d)  data() 成员函数: 得到指向容器首个元素的指针
+
+    #include <iostream>
+    #include <array>
+    using namespace std;
+    int main()
+    {
+        array<int, 5> words{1,2,3,4,5};
+        cout << *( words.data()+1);    //通过该指针，可以获得容器中的各个元素
+        return 0;
+    }
+
 ```  
 
+(4) array相对于数组的提升
+
+  array 容器代替普通数组，最直接的好处就是 array 模板类中已经为我们写好了很多实用的方法，可以大大提高我们编码效率。例如:
+  
+         1) array 容器提供的 at() 成员函数，可以有效防止越界操纵数组的情况
+  
+         2) fill() 函数可以实现数组的快速初始化
+  
+         3) swap() 函数可以轻松实现两个相同数组内容交换（类型相同，大小相同）
+
+         4) 两个 array 容器满足大小相同并且保存元素的类型相同时，两个 array 容器可以直接直接做赋值操作
+
+         5) 可以用任何比较运算符直接比较两个 array 容器
+
+例子：
+
+```
+1) 实现两个数组内容交换
+
+    array<char, 50>addr1{"http://www.cdsy.xyz"};
+    array<char, 50>addr2{ "http://www.cdsy.xyz/computer/programme/stl/" };
+    addr1.swap(addr2);
+    printf("addr1 is：%s\n", addr1.data());
+    printf("addr2 is：%s\n", addr2.data());
+
+    输出：
+         addr1 is：http://www.cdsy.xyz/computer/programme/stl/
+         addr2 is：http://www.cdsy.xyz
+
+2) 两个数组之间赋值
+
+    array<char, 50>addr1{ "http://www.cdsy.xyz" };
+    array<char, 50>addr2{ "http://www.cdsy.xyz/computer/programme/stl/" };
+    addr1 = addr2;
+    
+3) 两个数组之间比较
+
+    array<char, 50>addr1{ "http://www.cdsy.xyz" };
+    array<char, 50>addr2{ "http://www.cdsy.xyz/computer/programme/stl/" };
+    if (addr1 == addr2) {
+        std::cout << "addr1 == addr2" << std::endl;
+    }
+    if (addr1 < addr2) {
+        std::cout << "addr1 < addr2" << std::endl;
+    }
+    if (addr1 > addr2) {
+        std::cout << "addr1 > addr2" << std::endl;
+    }
+
+```
 
 ##### 2. vector容器
 
