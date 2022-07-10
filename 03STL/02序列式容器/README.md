@@ -263,6 +263,8 @@ d) 指定初始值的范围
 1. 遍历
 
 ```
+a) 遍历容器所有元素
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -285,13 +287,46 @@ int main()
     value.insert(value.begin(), 'C');   //向容器开头插入字符
     cout << "首个元素为：" << value.at(0) << endl;
     return 0;
-}            
+}  
+
+b) 当容器容量增加时，地址可能会发生改变，这会导致之前创建的迭代器失效
+
+#include <iostream>
+#include <vector>
+using namespace std;
+int main()
+{
+    vector<int>values{1,2,3};
+    cout << "values 容器首个元素的地址：" << values.data() << endl;
+    auto first = values.begin();
+    auto end = values.end();
+    
+    //增加 values 的容量
+    values.reserve(20);
+    cout << "values 容器首个元素的地址：" << values.data() << endl;
+    while (first != end) 
+    {
+        cout << *first;    //增加容量之后，首个元素的存储地址发生了改变，此时再使用先前创建的迭代器，显然是错误的
+        ++first;
+    }
+    return 0;
+}
+
+  输出：
+       values 容器首个元素的地址：0096DFE8
+       values 容器首个元素的地址：00965560
+
 ```       
 
 2. 增
 
 ```
-             
+a) 
+
+
+
+
+
 ```       
 
 3. 删
@@ -303,7 +338,45 @@ int main()
  4. 改
 
 ```
-             
+a) []：进行访问与修改元素，不会检查越界访问
+ 
+   vector<int> values{1,2,3,4,5};
+   cout << values[0] << endl;            //获取容器中首个元素：1
+   
+   values[0] = values[1] + values[2] + values[3] + values[4];   //修改容器中下标为 0 的元素的值
+   cout << values[0] << endl;            // 输出：14
+ 
+ b) at() 成员函数: 越界时，会抛出std::out_of_range异常，提高安全性
+ 
+   vector<int> values{1,2,3,4,5};
+    
+   cout << values.at(0) << endl;    //获取容器中首个元素：1
+    
+   values.at(0) = values.at(1) + values.at(2) + values.at(3) + values.at(4);   //修改容器中下标为 0 的元素的值
+   cout << values.at(0) << endl;    //输出：14
+
+   //cout << values.at(5) << endl;  //这条语句会发生 out_of_range 异常
+ 
+c)  front() 和 back(): 修改首尾元素
+
+   vector<int> values{1,2,3,4,5};
+   cout << "values 首元素为：" << values.front() << endl;   //输出：1
+   cout << "values 尾元素为：" << values.back() << endl;    //输出：5
+
+   values.front() = 10;      //修改首元素
+   cout <<"values 新的首元素为：" << values.front() << endl;  //输出：10
+   
+   values.back() = 20;       //修改尾元素
+   cout << "values 新的尾元素为：" << values.back() << endl;  //输出：20
+
+d) data() 成员函数: 通过指针修改
+   vector<int> values{1,2,3,4,5};
+   cout << *(values.data() + 2) << endl;  //输出容器中第 3 个元素的值：3
+   
+   //修改容器中第 2 个元素的值
+   *(values.data() + 1) = 10;    
+   cout << *(values.data() + 1) << endl;  //输出：10
+
 ```              
   
  5. 查
