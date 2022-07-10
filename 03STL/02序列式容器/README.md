@@ -256,6 +256,7 @@ d) 指定初始值的范围
 (2) 常见成员函数
 
 ![image](https://user-images.githubusercontent.com/42632290/178138057-7e64b928-1154-4a9a-a2a7-561ffa7f19c1.png)
+![image](https://user-images.githubusercontent.com/42632290/178138157-1578d909-5c90-44be-9e23-29ad6937e4fd.png)
 
 (3) 迭代器使用详解
 
