@@ -321,18 +321,206 @@ int main()
 2. 增
 
 ```
-a) 
+a) push_back()函数: 先创建这个元素，然后再将这个元素拷贝或者移动到容器中（如果是拷贝的话，事后会自行销毁先前创建的这个元素）
+b) emplace_back()函数:直接在容器尾部创建这个元素，省去了拷贝或移动元素的过程
 
+#include <vector> 
+#include <iostream> 
+using namespace std;
+class testDemo
+{
+public:
+    testDemo(int num):num(num)
+    {
+        std::cout << "调用构造函数" << endl;
+    }
+    testDemo(const testDemo& other) :num(other.num) 
+    {
+        std::cout << "调用拷贝构造函数" << endl;
+    }
+    testDemo(testDemo&& other) :num(other.num) 
+    {
+        std::cout << "调用移动构造函数" << endl;
+    }
+private:
+    int num;
+};
 
+int main()
+{
+    cout << "emplace_back:" << endl;
+    std::vector<testDemo> demo1;
+    demo1.emplace_back(2);  
 
+    cout << "push_back:" << endl;
+    std::vector<testDemo> demo2;
+    demo2.push_back(2);
+}
 
+   输出：emplace_back:
+            调用构造函数
+         push_back:
+            调用构造函数
+            调用移动构造函数
+   注意：在实际使用时，优先选用 emplace_back(), 由于emplace_back() 是 C++ 11 标准新增加的，如果程序要兼顾之前的版本，还是应该使用 push_back()
+
+c) insert()函数：指定位置插入一个或多个元素
+   iterator insert(pos,elem);             //在迭代器 pos 指定的位置之前插入一个新元素elem，并返回表示新插入元素位置的迭代器
+   iterator insert(pos,n,elem);           //在迭代器 pos 指定的位置之前插入 n 个元素 elem，并返回表示第一个新插入元素位置的迭代器
+   iterator insert(pos,first,last);       //在迭代器 pos 指定的位置之前，插入其他容器位于 [first,last) 区域的所有元素，并返回表示第一个新插入元素位置的迭代器
+   iterator insert(pos,initlist);         //在迭代器 pos 指定的位置之前，插入初始化列表（用大括号{}括起来的多个元素，中间有逗号隔开）中所有的元素，并返回表示第一个新插入元素位置的迭代器
+   
+#include <iostream> 
+#include <vector> 
+#include <array> 
+using namespace std;
+int main()
+{
+    std::vector<int> demo{1,2};
+    //第一种格式用法
+    demo.insert(demo.begin() + 1, 3);//{1,3,2}
+
+    //第二种格式用法
+    demo.insert(demo.end(), 2, 5);//{1,3,2,5,5}
+
+    //第三种格式用法
+    std::array<int,3>test{ 7,8,9 };
+    demo.insert(demo.end(), test.begin(), test.end());//{1,3,2,5,5,7,8,9}
+
+    //第四种格式用法
+    demo.insert(demo.end(), { 10,11 });//{1,3,2,5,5,7,8,9,10,11}
+
+    for (int i = 0; i < demo.size(); i++) {
+        cout << demo[i] << " ";
+    }
+    return 0;
+}
+
+d) emplace()函数：emplace() 每次只能插入一个元素，而不是多个
+   iterator emplace (const_iterator pos, args...);  //args...，即被插入元素的构造函数需要多少个参数，那么在 emplace() 的第一个参数的后面，就需要传入相应数量的参数
+
+#include <vector>
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    std::vector<int> demo1{1,2};
+    //emplace() 每次只能插入一个 int 类型元素
+    demo1.emplace(demo1.begin(), 3);
+    for (int i = 0; i < demo1.size(); i++) {
+        cout << demo1[i] << " ";
+    }
+    return 0;
+}
+
+    注意： emplace() 在插入元素时，是在容器的指定位置直接构造元素，而不是先单独生成，再将其复制（或移动）到容器中。因此，推荐优先使用 emplace()。
 
 ```       
 
 3. 删
 
 ```
-             
+a) pop_back(): 删除 vector 容器中最后一个元素，该容器的大小（size）会减 1，但容量（capacity）不会发生改变
+b) erase(pos): 删除 vector 容器中 pos 迭代器指定位置处的元素，并返回指向被删除元素下一个位置元素的迭代器。该容器的大小（size）会减 1，但容量（capacity）不会发生改变
+c) swap(end)、pop_back(): 先调用 swap() 函数交换要删除的目标元素和容器最后一个元素的位置，然后使用 pop_back() 删除该目标元素
+d) erase(beg,end): 删除 vector 容器中位于迭代器 [beg,end)指定区域内的所有元素，并返回指向被删除区域下一个位置元素的迭代器。该容器的大小（size）会减小，但容量（capacity）不会发生改变。
+e) remove(): 删除容器中所有和指定元素值相等的元素，并返回指向最后一个元素下一个位置的迭代器。值得一提的是，调用该函数不会改变容器的大小和容量
+f) clear(): 删除 vector 容器中所有的元素，使其变成空的 vector 容器。该函数会改变 vector 的大小（变为 0），但不是改变其容量
+
+示例c:
+
+#include <vector>
+#include <iostream>
+#include <algorithm>  //swap在头文件 <algorithm> 和 <utility> 中都有定义，使用时引入其中一个即可
+using namespace std;
+
+int main()
+{
+    vector<int>demo{ 1,2,3,4,5 };
+    
+    swap(*(std::begin(demo)+1),*(std::end(demo)-1));//等同于 swap(demo[1],demo[4]) //交换要删除元素和最后一个元素的位置
+   
+    //交换位置后的demo容器
+    for (int i = 0; i < demo.size(); i++) {
+        cout << demo[i] << " ";
+    }
+    demo.pop_back();
+    cout << endl << "size is :" << demo.size() << endl;
+    cout << "capacity is :" << demo.capacity() << endl;
+    
+    //输出demo 容器中剩余的元素
+    for (int i = 0; i < demo.size(); i++) {
+        cout << demo[i] << " ";
+    }
+    return 0;
+}
+  运行结果：
+           1 5 3 4 2
+           size is :4
+           capacity is :5
+           1 5 3 4
+
+示例e:
+#include <vector>
+#include <iostream>
+#include <algorithm>  //remove函数，定义在 <algorithm> 头文件中
+using namespace std;
+
+int main()
+{
+    vector<int>demo{ 1,3,3,4,3,5 };
+    
+    auto iter = std::remove(demo.begin(), demo.end(), 3);  //交换要删除元素和最后一个元素的位置
+
+    cout << "size is :" << demo.size() << endl;
+    cout << "capacity is :" << demo.capacity() << endl;
+    //输出剩余的元素
+    for (auto first = demo.begin(); first < iter;++first) {
+        cout << *first << " ";
+    }
+    return 0;
+}
+
+输出：
+    size is :6
+    capacity is :6
+    1 4 5
+
+注意：
+    在对容器执行完 remove 函数之后，由于并没有改变容器原来的大小和容量，因此无法使用之前的方法遍历容器，而是需要向程序中那样，借助 remove返回的迭代器完成正确的遍历
+
+原理：
+    remove() 的实现原理是，在遍历容器中的元素时，一旦遇到目标元素，就做上标记，然后继续遍历，直到找到一个非目标元素，即用此元素将最先做标记的位置覆盖掉，同时将此非目标元素所在的位置也做上标记，等待找到新的非目标元素将其覆盖。因此，如果将上面程序中 demo 容器的元素全部输出，得到的结果为 1 4 5 4 3 5
+
+    另外还可以看到，既然通过 remove() 函数删除掉 demo 容器中的多个指定元素，该容器的大小和容量都没有改变，其剩余位置还保留了之前存储的元素。我们可以使用 erase() 成员函数删掉这些 "无用" 的元素
+
+#include <vector>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    vector<int>demo{ 1,3,3,4,3,5 };
+    //交换要删除元素和最后一个元素的位置
+    auto iter = std::remove(demo.begin(), demo.end(), 3);
+    
+    demo.erase(iter, demo.end());  // remove()用于删除容器中指定元素时，常和 erase() 成员函数搭配使用
+    
+    cout << "size is :" << demo.size() << endl;
+    cout << "capacity is :" << demo.capacity() << endl;
+    //输出剩余的元素
+    for (int i = 0; i < demo.size();i++) {
+        cout << demo[i] << " ";
+    }
+    return 0;
+}
+
+输出：size is :3
+      capacity is :6
+      1 4 5
+
 ```         
              
  4. 改
@@ -382,48 +570,88 @@ d) data() 成员函数: 通过指针修改
  5. 查
 
 ```
-             
+
 ```  
+
+(4) 高级使用及特别注意事项
+
+1. 如何避免vector容器进行不必要的扩容
+
+```
+
+```
+
+2. swap()成员方法使用
+
+```
+
+```
+
+3. 切忌，vector<bool>不是存储bool类型元素的vector容器
+
+```
+
+```
+
+
 
 ##### 3. deque容器
 
 (0) 概述
-    
-    
+
+
 (1) 创建
 
+
+
 (2) 常见成员函数
-             
+
+
+
+
 (3) 迭代器使用详解
 
 1. 遍历
 
 ```
-             
+
+
+
 ```       
 
 2. 增
 
 ```
-             
+
+
+
 ```       
 
 3. 删
 
 ```
-             
+
+
+
+
+
 ```         
              
  4. 改
 
 ```
-             
+
+
+
 ```              
   
  5. 查
 
 ```
-             
+
+
+
+
 ```  
 
 ##### 4. list容器
