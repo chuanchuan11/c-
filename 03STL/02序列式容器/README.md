@@ -682,66 +682,178 @@ for (int i = 1; i <= 1000; i++) {
 
 &emsp;&emsp;在实际使用中避免使用 vector<bool> 这样的存储结构. vector会以bit方式存储，无法像其他元素那样直接使用[]获取元素，可能导致编译失败，**可以选择使用 deque<bool> 或者 bitset 来替代**
       
-&emsp;&emsp;参考：
+参考：
     
-&emsp;&emsp;&emsp;&emsp;1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510779311975.html
+&emsp;&emsp;1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510779311975.html
 
 ##### 3. deque容器
 
 (0) 概述
-
+    
+&emsp;&emsp;deque 是 double-ended queue 的缩写，又称双端队列容器.deque 容器和 vecotr 容器有很多相似之处
+  
+&emsp;&emsp;相似：deque 容器也擅长在序列尾部添加或删除元素，而不擅长在序列中间添加或删除元素 
+    
+&emsp;&emsp;不同：deque 还擅长在序列头部添加或删除元素。并且更重要的一点是，deque 容器中存储元素并不能保证所有元素都存储到连续的内存空间中
+  
+&emsp;&emsp;**当需要向序列两端频繁的添加或删除元素时，应首选 deque 容器**。
+    
+```
+1）头文件
+  #include <deque>
+  using namespace std;    
+```
 
 (1) 创建
 
+```
+1) 创建空 deque 容器：
+    
+   std::deque<int> d;
 
+2) 创建具有 n 个元素的 deque 容器
+    
+   std::deque<int> d(10);    //具有 10 个元素（默认都为 0）
+    
+3) 具有 n 个元素的 deque 容器，并为每个元素都指定初始值
+    
+   std::deque<int> d(10, 5)  //包含 10 个元素（值都为 5）
+    
+4) 通过拷贝函数创建一个新的 deque 容器
+    
+   std::deque<int> d1(5);
+   std::deque<int> d2(d1);
+    
+5) 拷贝其他类型容器中指定区域内的元素（也可以是普通数组），可以创建一个新容器
+    
+   int a[] = { 1,2,3,4,5 };       
+   std::deque<int>d(a, a + 5);  //拷贝普通数组，创建deque容器
+  
+   std::array<int, 5>arr{ 11,12,13,14,15 };
+   std::deque<int>d(arr.begin()+2, arr.end());  //拷贝arr容器中的{13,14,15}
+
+```
 
 (2) 常见成员函数
 
+![image](https://user-images.githubusercontent.com/42632290/180638230-efcedbdf-cb05-4945-a106-e3d239dbb9ff.png)
+![image](https://user-images.githubusercontent.com/42632290/180638247-89b27b49-696b-4589-9d77-bb328c26c175.png)
 
+&emsp;&emsp;和 vector 相比，额外增加了实现在容器头部添加和删除元素的成员函数，同时删除了 capacity()、reserve() 和 data() 成员函数
 
-
+&emsp;&emsp;deque 容器没有提供 data() 成员函数，同时 deque 容器在存储元素时，也无法保证其会将元素存储在连续的内存空间中，因此尝试使用指针去访问 deque 容器中指定位置处的元素，是非常危险的
+    
 (3) 迭代器使用详解
 
 1. 遍历
 
 ```
+#include <iostream>
+#include <deque>
+using namespace std;
+int main()
+{
+    deque<int>d{1,2,3,4,5};
+    //从容器首元素，遍历至最后一个元素
+    for (auto i = d.begin(); i < d.end(); i++) 
+    {
+        cout << *i << " ";   //输出结果：1 2 3 4 5
+    }
+    return 0;
+}
+                      
+1) 需要注意的一点是，迭代器的功能是遍历容器，在遍历的同时可以访问（甚至修改）容器中的元素，但迭代器不能用来初始化空的 deque 容器：
 
+错误用法：
+        #include <iostream>
+        #include <vector>
+        using namespace std;
+        int main()
+        {
+            vector<int>values;
+            auto first = values.begin();
+            //*first = 1;
+            return 0;
+        }
+对于空的 deque 容器来说，可以通过 push_back()、push_front() 或者 resize() 成员函数实现向（空）deque 容器中添加元素
 
+    
+2) 向 deque 容器添加元素时，deque 容器会申请更多的内存空间，同时其包含的所有元素可能会被复制或移动到新的内存地址（原来占用的内存会释放），这会导致之前创建的迭代器失效   
+    
+#include <iostream>
+#include <deque>
+using namespace std;
+int main()
+{
+    deque<int>d;
+    d.push_back(1);
+    auto first = d.begin();
+    cout << *first << endl;
+    //添加元素，会导致 first 失效
+    d.push_back(1);
+    cout << *first << endl;  //first 失效,会导致程序运行崩溃
+    return 0;
+}
 
 ```       
 
-2. 增
+2. 增加与删除
+
+![image](https://user-images.githubusercontent.com/42632290/180639889-4310d1f8-0af8-48b3-b02f-b19f7a4e7381.png)
+
+**在实际应用中，常用 emplace()、emplace_front() 和 emplace_back()，效率高**
+                        
+![image](https://user-images.githubusercontent.com/42632290/180639940-f4f12968-b5ba-4d8c-a789-41a32ef33319.png)
+
+
+3. 查找与修改
 
 ```
+1) 采用普通数组访问存储元素的方式: 效率高
 
-
-
-```       
-
-3. 删
-
-```
-
-
-
-
-
-```         
-             
- 4. 改
-
-```
-
-
-
-```              
-  
- 5. 查
-
-```
-
-
-
+   #include <iostream>
+   #include <deque>
+   using namespace std;
+    int main()
+    {
+        deque<int>d{ 1,2,3,4 };
+        cout << d[1] << endl;   //输出：2
+        
+        d[1] = 5;    //修改指定下标位置处的元素
+        cout << d[1] << endl;   //输出: 5
+        return 0;
+    }
+    
+2) at(): 成员函数, 有效地避免越界访问
+    
+    #include <iostream>
+    #include <deque>
+    using namespace std;
+    int main()
+    {
+        deque<int>d{ 1,2,3,4 };
+        cout << d.at(1) << endl;
+        d.at(1) = 5;
+        cout << d.at(1) << endl;
+        
+        //cout << d.at(10) << endl;  //会抛出 out_of_range 异常
+        return 0;
+    } 
+    
+3) front() 和 back(): 访问（甚至修改）容器中的首尾元素
+    
+    deque<int> d{ 1,2,3,4,5 };
+    cout << "deque 首元素为：" << d.front() << endl;
+    cout << "deque 尾元素为：" << d.back() << endl;
+    
+    //修改首元素
+    d.front() = 10;
+    cout << "deque 新的首元素为：" << d.front() << endl;
+    
+    //修改尾元素
+    d.back() = 20;
+    cout << "deque 新的尾元素为：" << d.back() << endl;
+    return 0;   
 
 ```  
 
