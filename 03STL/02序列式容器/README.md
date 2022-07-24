@@ -624,17 +624,67 @@ for (int i = 1; i <= 1000; i++) {
 
 2. swap()成员方法使用
 
+&emsp;&emsp;vector 模板类中提供了 pop_back()、erase()、clear() 等成员方法，可以轻松实现删除容器中已存储的元素。**但需要注意得是，借助这些成员方法只能删除指定的元素，容器的容量并不会因此而改变**。
+
 ```
+1) 示例
+  myvector.erase(myvector.begin());
+  cout << "4、当前 myvector 拥有 " << myvector.size() << " 个元素，容量为 " << myvector.capacity() << endl;
+
+  myvector.pop_back();
+  cout << "5、当前 myvector 拥有 " << myvector.size() << " 个元素，容量为 " << myvector.capacity() << endl;
+
+  myvector.clear();
+  cout << "6、当前 myvector 拥有 " << myvector.size() << " 个元素，容量为 " << myvector.capacity() << endl;
+
+  输出：
+  4、当前 myvector 拥有 9 个元素，容量为 1000
+  5、当前 myvector 拥有 8 个元素，容量为 1000
+  6、当前 myvector 拥有 0 个元素，容量为 1000
+
+  显然，myvector 容器存储的元素个数在减少，但容量并不会减小
+
+2) shrink_to_fit(): 将当前 vector 容器的容量缩减至和实际存储元素的个数相等
+  myvector.shrink_to_fit();
+  cout << "7、当前 myvector 拥有 " << myvector.size() << " 个元素，容量为 " << myvector.capacity() << endl;
+
+3) swap()方法去除vector多余容量
+
+    vector<int>myvector;   //手动为 myvector 扩容
+    
+    myvector.reserve(1000);
+    cout << "1、当前 myvector 拥有 " << myvector.size() << " 个元素，容量为 " << myvector.capacity() << endl;
+    
+    //利用 myvector 容器存储 10 个元素
+    for (int i = 1; i <= 10; i++) {
+        myvector.push_back(i);
+    }
+
+    vector<int>(myvector).swap(myvector);    //将 myvector 容量缩减至 10
+    cout << "2、当前 myvector 拥有 " << myvector.size() << " 个元素，容量为 " << myvector.capacity() << endl;
+
+  输出结果：
+    1、当前 myvector 拥有 0 个元素，容量为 1000
+    2、当前 myvector 拥有 10 个元素，容量为 10
+
+  作用过程：
+    1) 先执行 vector<int>(myvector)，此表达式会调用 vector 模板类中的拷贝构造函数，从而创建出一个临时的 vector 容器（后续称其为 tempvector）
+    2) 然后借助 swap() 成员方法对 tempvector 临时容器和 myvector 容器进行调换，此过程不仅会交换 2 个容器存储的元素，还会交换它们的容量
+    3) 当整条语句执行结束时，临时的 tempvector 容器会被销毁，其占据的存储空间都会被释放。注意，这里释放的其实是原 myvector 容器占用的存储空间
+
+4) 利用swap()方法清空vector容器
+
+    vector<int>().swap(x);  //会调用默认构造函数，生成空的 vector 容器，再借助 swap() 方法将空容器交换给 x，从而达到清空 x 的目的
 
 ```
 
 3. 切忌，vector<bool>不是存储bool类型元素的vector容器
 
-```
-
-```
-
-
+&emsp;&emsp;在实际使用中避免使用 vector<bool> 这样的存储结构. vector会以bit方式存储，无法像其他元素那样直接使用[]获取元素，可能导致编译失败，**可以选择使用 deque<bool> 或者 bitset 来替代**
+      
+&emsp;&emsp;参考：
+    
+&emsp;&emsp;&emsp;&emsp;1) http://www.cdsy.xyz/computer/programme/stl/20210307/cd161510779311975.html
 
 ##### 3. deque容器
 
