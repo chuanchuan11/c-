@@ -196,6 +196,10 @@ struct NewCounter { // 使用原子变量的计数器
 };
 ```
 
+参考： https://blog.csdn.net/weixin_44479862/article/details/128059243
+
+
+
 ##### (5) std::condition_variable 与 std::condition_variable_any
 
     条件变量是c++11引入的一种同步机制，它可以阻塞一个线程或者多个线程，直到有线程通知或者超时才会唤醒正在阻塞的线程，条件变量需要和锁配合使用，这里的锁就是上面介绍的std::unique_lock
