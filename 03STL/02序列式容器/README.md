@@ -1207,6 +1207,19 @@ int main()
              
 ```  
 
+5. empty()和size()都可以判断容器是否为空，谁更好？
+    
+```
+a) if(cont.size() == 0)
+b) if(cont.empty())
+    
+    建议使用 empty() 成员方法。理由很简单，无论是哪种容器，只要其模板类中提供了 empty() 成员方法，使用此方法都可以保证在 O(1) 时间复杂度内完成对“容器是否为空”的判断；但对于 list 容器来说，使用 size() 成员方法判断“容器是否为空”，可能要消耗 O(n) 的时间复杂度
+    
+```
+
+参考：https://www.cdsy.xyz/computer/programme/stl/20210307/cd161510780611986.html
+    
+    
 ##### 5. forward_list容器
 
 (0) 概述
