@@ -920,30 +920,290 @@ e) 拷贝其他类型容器（或者普通数组）中指定区域内的元素
 1. 遍历
 
 ```
-             
+    (1) list不支持随机访, 只能通过迭代器遍历容器中的数据
+    
+示例:
+#include <iostream>
+#include <list>
+using namespace std;
+
+int main()
+{
+    //创建 list 容器
+    std::list<char> values{'h','t','t','p',':','/','/','w','w','w','.','c','d','s','y','.','x','y','z'};
+    
+    //使用begin()/end()迭代器函数对输出list容器中的元素
+    for (std::list<char>::iterator it = values.begin(); it != values.end(); ++it) {
+        std::cout << *it;   //输出：http://www.cdsy.xyz
+    }
+    cout << endl;
+    
+    //使用 rbegin()/rend()迭代器函数输出 lsit 容器中的元素
+    for (std::list<char>::reverse_iterator it = values.rbegin(); it != values.rend();++it) {
+        std::cout << *it;   //输出：zyx.ysdc.www//:ptth
+    }
+    return 0;
+}
+    
+    
+    
+    
 ```       
 
 2. 增
 
+    插入元素推荐使用emplace 系列方法的执行效率更高
+    
 ```
-             
+a) 仅有 1 种语法格式的内置函数
+
+    push_front()：向 list 容器首个元素前添加新元素；
+    push_back()： 向 list 容器最后一个元素后添加新元素；
+    emplace_front()：在容器首个元素前直接生成新的元素；
+    emplace_back()： 在容器最后一个元素后直接生成新的元素；
+    emplace()：在容器的指定位置直接生成新的元素；
+    
+示例:
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    std::list<int> values{1,2,3};
+    values.push_front(0);//{0,1,2,3}
+    values.push_back(4); //{0,1,2,3,4}
+
+    values.emplace_front(-1);//{-1,0,1,2,3,4}
+    values.emplace_back(5);  //{-1,0,1,2,3,4,5}
+   
+    //emplace(pos,value),其中 pos 表示指明位置的迭代器，value为要插入的元素值
+    values.emplace(values.end(), 6);//{-1,0,1,2,3,4,5,6}
+}
+    
+b) insert()成员方法
+    
+    iterator insert(pos,elem)   //在 pos 位置之前插入一个新元素 elem，并返回表示新插入元素位置的迭代器。
+    iterator insert(pos,n,elem)	//在 pos 位置之前插入 n 个元素 elem，并返回表示第一个新插入元素位置的迭代器。
+    iterator insert(pos,first,last) //在 pos 位置之前，插入其他容器（例如 array、vector、deque 等）中位于 [first,last) 区域的所有元素，并返回表示第一个新插入元素位置的迭代器。
+    iterator insert(pos,initlist) //在 pos 位置之前，插入初始化列表（用大括号 { } 括起来的多个元素，中间有逗号隔开）中所有的元素，并返回表示第一个新插入元素位置的迭代器
+    
+示例：
+#include <iostream>
+#include <list>
+#include <array>
+using namespace std;
+int main()
+{
+    std::list<int> values{ 1,2 };
+    //第一种格式用法
+    values.insert(values.begin() , 3);  //{3,1,2}
+
+    //第二种格式用法
+    values.insert(values.end(), 2, 5);  //{3,1,2,5,5}
+
+    //第三种格式用法
+    std::array<int, 3>test{ 7,8,9 };
+    values.insert(values.end(), test.begin(), test.end());  //{3,1,2,5,5,7,8,9}
+
+    //第四种格式用法
+    values.insert(values.end(), { 10,11 });   //{3,1,2,5,5,7,8,9,10,11}
+}
+    
+c) splice()成员方法   
+
+   void splice (iterator position, list& x); //position 为迭代器，用于指明插入位置；x 为另一个 list 容器。将 x 容器中存储的所有元素全部移动当前 list 容器中 position 指明的位置处。 
+   void splice (iterator position, list& x, iterator i); //position 为迭代器，用于指明插入位置；x 为另一个 list 容器；i 也是一个迭代器，用于指向 x 容器中某个元素。将 x 容器中 i 指向的元素移动到当前容器中 position 指明的位置处。 
+   void splice (iterator position, list& x, iterator first, iterator last);	//position 为迭代器，用于指明插入位置；x 为另一个 list 容器；first 和 last 都是迭代器。将 x 容器 [first, last) 范围内所有的元素移动到当前容器 position 指明的位置处 
+
+示例：
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    //创建并初始化 2 个 list 容器
+    list<int> mylist1{ 1,2,3,4 }, mylist2{10,20,30};
+    list<int>::iterator it = ++mylist1.begin(); //指向 mylist1 容器中的元素 2
+   
+    //调用第一种语法格式
+    mylist1.splice(it, mylist2); // mylist1: 1 10 20 30 2 3 4
+                                 // mylist2:
+                                 // it 迭代器仍然指向元素 2，只不过容器变为了 mylist1
+
+    //调用第二种语法格式，将 it 指向的元素 2 移动到 mylist2.begin() 位置处
+    mylist2.splice(mylist2.begin(), mylist1, it);   // mylist1: 1 10 20 30 3 4
+                                                    // mylist2: 2
+                                                    // it 仍然指向元素 2
+   
+    //调用第三种语法格式，将 [mylist1.begin(),mylist1.end())范围内的元素移动到 mylist.begin() 位置处                  
+    mylist2.splice(mylist2.begin(), mylist1, mylist1.begin(), mylist1.end());//mylist1:
+                                                                             //mylist2:1 10 20 30 3 4 2
+}
+    
+Note:
+    list 容器底层使用的是链表存储结构，splice() 成员方法移动元素的方式是，将存储该元素的节点从 list 容器底层的链表中摘除，然后再链接到当前 list 容器底层的链表中。这意味着，当使用 splice() 成员方法将 x 容器中的元素添加到当前容器的同时，该元素会从 x 容器中删除
 ```       
 
 3. 删
 
+    list 容器在进行插入（insert()）、接合（splice()）等操作时，都不会造成原有的 list 迭代器失效，甚至进行删除操作，而只有指向被删除元素的迭代器失效，其他迭代器不受任何影响
+
 ```
-             
+a) pop_front(): 删除位于 list 容器头部的一个元素。
+   pop_back(): 删除位于 list 容器尾部的一个元素
+   clear(): 删除 list 容器存储的所有元素
+
+示例：
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    list<int>values{ 1,2,3,4 };
+   
+    //删除当前容器中首个元素
+    values.pop_front();//{2,3,4}
+   
+    //删除当前容器最后一个元素
+    values.pop_back();//{2,3}
+   
+    //清空容器，删除容器中所有的元素
+    values.clear(); //{}
+}
+    
+b) erase() 成员函数: 按照被删除元素所在的位置来执行删除操作
+    
+    iterator erase (iterator position);    //删除 list 容器中 position 迭代器所指位置处的元素
+    iterator erase (iterator first, iterator last); //删除 list 容器中 first 迭代器和 last 迭代器限定区域内的所有元素（包括 first 指向的元素，但不包括 last 指向的元素）
+
+示例1：
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    list<int>values{ 1,2,3,4,5 };
+    //指向元素 1 的迭代器
+    auto del = values.begin();
+    //迭代器右移，改为指向元素 2
+    ++del;
+    values.erase(del);   //{1,3,4,5}
+}
+
+示例2：
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    list<int>values{ 1,2,3,4,5 };
+    //指定删除区域的左边界
+    auto first = values.begin();
+    ++first;//指向元素 2
+
+    //指向删除区域的右边界
+    auto last = values.end();
+    --last;//指向元素 5
+
+    //删除 2、3 和 4
+    values.erase(first, last);   //1 5
+}
+    
+c) remove() 成员函数: 根据元素的值来执行删除操作
+
+ 示例：
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    list<char>values{'a','b','c','d'};
+    values.remove('c');  //a b d
+}
+
+d) unique() 函数
+
+    void unique() //去除 list 容器中相邻重复的元素，仅保留一份
+    void unique（BinaryPredicate）//传入一个二元谓词函数, 自定义去重的规则
+
+示例1：
+#include <iostream>
+#include <list>
+using namespace std;
+
+//二元谓词函数
+bool demo(double first, double second)
+{
+    return (int(first) == int(second));
+}
+
+int main()
+{
+    list<double> mylist{ 1,1.2,1.2,3,4,4.5,4.6 };
+    mylist.unique(); //{1, 1.2, 3, 4, 4.5, 4.6}  //删除相邻重复的元素，仅保留一份
+
+    //demo 为二元谓词函数，是我们自定义的去重规则
+    mylist.unique(demo);  //{1, 3, 4}
+}    
+
+e)  remove_if() 成员: 满足条件的都会被删除, unique只能删除相邻重复的
+    
+#include <iostream>
+#include <list>
+using namespace std;
+
+int main()
+{
+    std::list<int> mylist{ 15, 36, 7, 17, 20, 39, 4, 1 };
+    
+    //删除 mylist 容器中能够使 lamba 表达式成立的所有元素。
+    mylist.remove_if([](int value) {return (value < 10); }); //{15 36 17 20 39}
+}
+
 ```         
              
- 4. 改
+ 4. 改与查
 
+    list容器不支持随机访问, 未提供下标操作符 [] 和 at() 成员函数，也没有提供 data() 成员函数
+    
 ```
+a)  front() 和 back()函数: 返回第一个元素和最后一个元素的引用形式, 可以进行修改值 
              
-```              
-  
- 5. 查
+示例：
+#include <iostream>
+#include <list>
+using namespace std;
 
-```
+int main()
+{
+    std::list<int> mylist{ 1,2,3,4 };
+    int &first = mylist.front();
+    int &last = mylist.back();
+    cout << first << " " << last << endl;  //输出：1 4
+    first = 10;
+    last = 20;
+    cout << mylist.front() << " " << mylist.back() << endl;  //输出：10 20
+    return 0;
+}
+
+b) 使用迭代器进行修改和查找
+
+#include <iostream>
+#include <list>
+using namespace std;
+int main()
+{
+    const std::list<int> mylist{1,2,3,4,5};
+    auto it = mylist.begin();
+    cout << *it << " ";   //输出：1 
+    ++it;
+    while (it!=mylist.end())
+    {
+        cout << *it << " ";    //输出：2 3 4 5
+        ++it;  
+    }
+    return 0;
+}    
              
 ```  
 
