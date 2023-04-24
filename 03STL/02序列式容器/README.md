@@ -860,11 +860,61 @@ int main()
 ##### 4. list容器
 
 (0) 概述
-             
+
+  STL list 容器，又称双向链表容器，即该容器的底层是以双向链表的形式实现的。这意味着元素可以分散存储在内存空间里，而不是必须存储在一整块连续的内存空间中
+
+![image](https://user-images.githubusercontent.com/42632290/233992153-15a59367-90a7-4268-96cb-f2d26f6d5cd3.png)
+
+  每个元素都配备了 2 个指针，分别指向它的前一个元素和后一个元素。其中第一个元素的前向指针总为 null，因为它前面没有元素；同样，尾部元素的后向指针也总为 null
+    
+  list 容器具有一些其它容器（array、vector 和 deque）所不具备的优势，即可以在**序列已知的任何位置快速插入或删除元素（时间复杂度为O(1))**。并且在 list 容器中移动元素，也比其它容器的效率高。 
+    
+    list 容器的缺点是，它不能像 array 和 vector 那样，通过位置直接访问元素
+    
+```
+1.头文件
+#include <list>
+using namespace std;
+```
+
 (1) 创建
 
+```
+a) 创建空容器
+
+    std::list<int> values;  //空的 vector 容器，没有元素，所以没有为其分配空间。当添加第一个元素时，会自动分配内存
+    
+b) 包含 n 个元素的 list 容器
+    
+    std::list<int> values(10);  //包含 10 个元素，每个元素的值都为相应类型的默认值（int类型的默认值为 0）
+    
+c) 包含 n 个元素的 list 容器，指定初始值 
+    
+    std::list<int> values(10, 5); //10 个元素并且值都为 5 
+    
+d) 使用已有容器初始化新容器
+
+    std::list<int> value1(10);
+    std::list<int> value2(value1);
+
+e) 拷贝其他类型容器（或者普通数组）中指定区域内的元素
+
+   //拷贝普通数组，创建list容器
+   int a[] = { 1,2,3,4,5 };
+   std::list<int> values(a, a+5);
+
+   //拷贝其它类型的容器，创建 list 容器
+   std::array<int, 5> arr{ 11,12,13,14,15 };
+   std::list<int> values(arr.begin()+2, arr.end());  //拷贝arr容器中的{13,14,15} 
+
+```
+
+
 (2) 常见成员函数
-             
+
+![image](https://user-images.githubusercontent.com/42632290/233994737-4c4f9def-91a9-444e-a674-0be7c3b498a1.png)
+![image](https://user-images.githubusercontent.com/42632290/233994811-a100c8c2-8fc7-4cdc-ab52-3b5d8c622dc1.png)
+
 (3) 迭代器使用详解
 
 1. 遍历
