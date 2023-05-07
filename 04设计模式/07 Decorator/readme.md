@@ -30,15 +30,22 @@
 #### 模式设计
 
 ```
-  (1) Component 类充当抽象角色，不应该具体实现
-  
-  (2) 修饰类引用和继承 Component 类，具体扩展类重写父类方法
+
+(1) Component是定义一个对象接口, 可以给这些对象动态添加职责
+
+(2) ConcreteComponent是定义了一个具体对象, 也可以给对象添加一些职责
+
+(3) Decorator 装饰器抽象类, 继承Component, 从外类来扩展Component 的功能, 但是对于Component来讲, 无需知道Decorator 的存在
+
+(4) ConcreteDecorator具体修饰对象, 起到给 Component 添加职责的功能
 
 ```
 
-![image](https://user-images.githubusercontent.com/42632290/236661699-45ff5433-86e7-4269-bad6-66f094a096f0.png)
+![image](https://user-images.githubusercontent.com/42632290/236661797-f40a682e-ca6b-4b45-bb77-3aedd7be47eb.png)
 
 #### 示例
+
+![image](https://user-images.githubusercontent.com/42632290/236661699-45ff5433-86e7-4269-bad6-66f094a096f0.png)
 
 ```
 参考: decorator.cpp
