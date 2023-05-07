@@ -20,16 +20,22 @@
 
 #### 模式设计
 
+```
 (1) Subject类定义了RealSubject和Proxy公共接口
 
 (2) RealSubject定义Proxy所代表的真实实体
 
 (3) Proxy保存引用, 使得代理可以访问实体, 提供一个与Subject接口相同的接口
 
+```
+
 ![image](https://user-images.githubusercontent.com/42632290/236654432-4723255e-9ab7-40ba-ad5d-75b523c1b9d6.png)
 
 #### 示例
 
 ```
+(1) 逻辑代码: sample.cpp
+
+(2) 具体应用: proxy_ptr.cpp
 
 ```
