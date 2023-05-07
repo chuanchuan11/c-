@@ -30,8 +30,17 @@
 #### 模式设计
 
 ```
+  (1) Component 类充当抽象角色，不应该具体实现
+  
+  (2) 修饰类引用和继承 Component 类，具体扩展类重写父类方法
 
 ```
 
+![image](https://user-images.githubusercontent.com/42632290/236661699-45ff5433-86e7-4269-bad6-66f094a096f0.png)
+
 #### 示例
+
+```
+参考: decorator.cpp
+```
 
