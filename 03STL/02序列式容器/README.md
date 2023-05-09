@@ -1223,39 +1223,111 @@ b) if(cont.empty())
 ##### 5. forward_list容器
 
 (0) 概述
-             
+
+```
+    1) forward_list 是 C++ 11 新添加的一类容器，其底层实现和 list 容器一样，采用的也是链表结构，只不过 forward_list 使用的是单链表，而 list 使用的是双向链表.
+    
+    2) forward_list 容器具有和 list 容器相同的特性，即擅长在序列的任何位置进行插入元素或删除元素的操作，但对于访问存储的元素，没有其它容器（如 array、vector）的效率高.
+    
+    3) 单链表没有双向链表那样灵活，因此相比 list 容器，forward_list 容器的功能受到了很多限制。比如，由于单链表只能从前向后遍历，而不支持反向遍历，因此 forward_list 容器只提供前向迭代器，而不是双向迭代器
+    
+    4) 既然 forward_list 容器具有和 list 容器相同的特性，list 容器还可以提供更多的功能函数，forward_list 容器有什么存在的必要呢？
+    
+        forward_list 容器底层使用单链表，也不是一无是处。比如，存储相同个数的同类型元素，单链表耗用的内存空间更少，空间利用率更高，并且对于实现某些操作单链表的执行效率也更高
+    
+       效率高是选用 forward_list 而弃用 list 容器最主要的原因，换句话说，只要是 list 容器和 forward_list 容器都能实现的操作，应优先选择 forward_list 容器
+```
+
+```
+头文件：
+#include <forward_list>
+using namespace std; 
+```
+
 (1) 创建
 
+```
+a) 创建空的forward_list
+    
+    std::forward_list<int> values;
+    
+b) 创建包含n个元素的容器
+    
+    std::forward_list<int> values(10);  //int类型的默认值为 0
+
+c) 创建包含n个元素的容器，并指定初始值
+
+    std::forward_list<int> values(10, 5); //包含 10 个元素并且值都为 5 个 values 容器
+
+d) 使用已有容器初始化新容器
+
+    std::forward_list<int> value1(10);
+    std::forward_list<int> value2(value1); //必须保证新旧容器存储的元素类型一致
+
+e) 拷贝其他类型容器（或者普通数组）中指定区域内的元素
+
+    int a[] = { 1,2,3,4,5 };
+    std::forward_list<int> values(a, a+5); //拷贝普通数组，创建forward_list容器
+    
+    std::array<int, 5>arr{ 11,12,13,14,15 }; //拷贝其它类型的容器，创建forward_list容器
+    std::forward_list<int>values(arr.begin()+2, arr.end());//拷贝arr容器中的{13,14,15} 
+
+```
+
 (2) 常见成员函数
-             
+
+<img width="577" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/6f9e08c1-6218-4549-826e-8db0dddb522e">
+<img width="577" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/802b386b-9de3-45c7-a8e3-944c5c351f8c">
+    
 (3) 迭代器使用详解
 
 1. 遍历
 
 ```
-             
+略     
 ```       
 
-2. 增
+2. 增删改查
 
 ```
-             
+略 
 ```       
 
-3. 删
+(4) 使用forward_list容器相关的函数
 
 ```
-             
-```         
-             
- 4. 改
+a) forward_list 容器中不提供 size() 函数，如果想获取 forward_list 容器中存储元素的个数，可以使用头文件 <iterator> 中的 distance() 函数 
+    
+#include <iostream>
+#include <forward_list>
+#include <iterator>
+using namespace std;
 
-```
-             
-```              
-  
- 5. 查
+int main()
+{
+    std::forward_list<int> my_words{1,2,3,4};
+    int count = std::distance(std::begin(my_words), std::end(my_words));
+    cout << count;   //输出:4
+    return 0;
+}
 
+b) forward_list 容器迭代器的移动除了使用 ++ 运算符单步移动，还能使用 advance() 函数进行跨步移动
+    
+#include <iostream>
+#include <forward_list>
+using namespace std;
+
+int main()
+{
+    std::forward_list<int> values{1,2,3,4};
+    auto it = values.begin();
+    advance(it, 2);
+    while (it!=values.end())
+    {
+        cout << *it << " ";     //输出：3 4
+        ++it;
+    }
+    return 0;
+}
 ```
-             
-```  
+    
