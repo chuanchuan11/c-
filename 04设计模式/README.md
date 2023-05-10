@@ -50,7 +50,15 @@
     (1) 
 
 
-文档参考: https://www.cnblogs.com/bardzx/p/12095794.html
+#### 设计模式面试考察点
+
+    https://blog.csdn.net/sinat_21107433/article/details/120557373
+
+文档参考: 
+
+    (1) https://zhuanlan.zhihu.com/p/94877789
+
+    (2) https://www.cnblogs.com/bardzx/p/12095794.html
 
 >> 模板
 
