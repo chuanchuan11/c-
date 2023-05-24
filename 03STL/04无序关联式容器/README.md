@@ -137,7 +137,103 @@ int main()
 2. 增
 
 ```
-             
+a) insert() 直接插入: 成功返回pair, 迭代器指向新添加键值对, bool值为true; 失败返回已经存在键值对的迭起器,bool为false
+    
+    1) 以普通方式传递参数:     pair<iterator,bool> insert ( const value_type& val );
+    2) 以右值引用方式传递参数: 
+                             template <class P>
+                             pair<iterator,bool> insert ( P&& val );
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap;
+        std::pair<string, string>mypair("STL教程", "http://www.cdsy.xyz/computer/programme/stl/");   //构建要添加的键值对
+        std::pair<unordered_map<string, string>::iterator, bool> ret;   //创建接收 insert() 方法返回值的pair类型变量
+
+        ret = umap.insert(mypair);   //以普通方式传递参数
+        ret = umap.insert(std::make_pair("Python教程","http://www.cdsy.xyz/computer/programme/Python/"));  //右值引用方式传递参数
+
+        return 0;
+    }
+
+b) insert 添加到指定位置: 成功返回新元素的迭代器, 失败返回已有元素的迭代器,bool为false
+
+    1) 以普通方式传递参数: iterator insert ( const_iterator hint, const value_type& val );
+    2) 以右值引用方法传递参数: 
+                              template <class P>
+                              iterator insert ( const_iterator hint, P&& val );
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap;
+
+        std::pair<string, string>mypair("STL教程", "http://www.cdsy.xyz/computer/programme/stl/");  //构建要添加的键值对
+        unordered_map<string, string>::iterator iter;  //创建接收 insert() 方法返回值的迭代器类型变量
+
+        iter = umap.insert(umap.begin(), mypair);  //调用第一种语法格式
+        iter = umap.insert(umap.begin(), std::make_pair("Python教程", "http://www.cdsy.xyz/computer/programme/Python/"));  //调用第二种语法格式
+        return 0;
+    }
+注意：
+    以上 2 种语法格式中，虽然通过 hint 参数指定了新键值对添加到容器中的开始位置，但该键值对真正存储的位置并不是 hint 参数说了算，
+    最终的存储位置仍取决于该键值对的键的值
+
+c) insert 将某一个unordered_map 容器中指定区域内的所有键值对，复制到另一个 unordered_map 容器中
+
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap
+        { 
+          {"STL教程","http://www.cdsy.xyz/computer/programme/stl/"},
+          {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+          {"Java教程","http://www.cdsy.xyz/computer/programme/java/"} 
+        };
+        unordered_map<string, string> otherumap;     //创建一个空的 unordered_map 容器
+
+        unordered_map<string, string>::iterator first = ++umap.begin(); //指定要拷贝 umap 容器中键值对的范围
+        unordered_map<string, string>::iterator last = umap.end();
+
+        //复制给 otherumap 容器
+        otherumap.insert(first, last);
+        return 0;
+    }
+
+d) insert 一次向 unordered_map 容器添加多个键值对
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+using namespace std;
+int main()
+{
+    unordered_map<string, string> umap;
+
+    //向 umap 容器同时添加多个键值对
+    umap.insert({ {"STL教程","http://www.cdsy.xyz/computer/programme/stl/"},
+                  {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+                  {"Java教程","http://www.cdsy.xyz/computer/programme/java/"} 
+                });
+    return 0;
+}
+
+注意: 
+    (1) 需要注意的是，在操作 unordered_map 容器过程（尤其是向容器中添加新键值对）中，一旦当前容器的负载因子超过最大负载因子（默认值为 1.0）
+        ,该容器就会适当增加桶的数量（通常是翻一倍），并自动执行 rehash() 成员方法，重新调整各个键值对的存储位置（此过程又称“重哈希”）, 
+        此过程很可能导致之前创建的迭代器失效
+        
+    (2) 所谓迭代器失效，针对的是那些用于表示容器内某个范围的迭代器，由于重哈希会重新调整每个键值对的存储位置，所以容器重哈希之后,
+        之前表示特定范围的迭代器很可能无法再正确表示该范围。但是，重哈希并不会影响那些指向单个键值对元素的迭代器
+ 
 ```       
 
 3. 删
@@ -154,11 +250,98 @@ int main()
   
  5. 查
 
+  建议首选at使用,[]容易出错
+
 ```
-             
+1) []运算符访问元素
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+      //创建 umap 容器
+      unordered_map<string, string> umap
+      {
+          {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+          {"Java教程","http://www.cdsy.xyz/computer/programme/java/"},
+          {"Linux教程","http://www.cdsy.xyz/computer/system/linux/"} 
+      };
+      //获取 "Java教程" 对应的值
+      string str = umap["Java教程"];
+      cout << str << endl;            //输出结果: http://www.cdsy.xyz/computer/programme/java/
+      return 0;
+    }
+
+2) []访问时, 无存在元素则新添加键值对
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap;  //创建空 umap 容器
+        
+        string str = umap["STL教程"];  //[]运算符在=右侧, 没有存在的元素, 则新添加, value值为空字符串
+        
+        umap["C教程"] = "http://www.cdsy.xyz/computer/programme/C_language/";   //[]运算符在=左侧, 没有存在元素则新添加键值对
+
+        return 0;
+    }
+
+3) at 成员方法查看, 查找失败抛出out_of_range异常
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        //创建 umap 容器
+        unordered_map<string, string> umap
+        {
+            {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+            {"Java教程","http://www.cdsy.xyz/computer/programme/java/"},
+            {"Linux教程","http://www.cdsy.xyz/computer/system/linux/"} 
+        };
+
+        string str = umap.at("Python教程");  //获取指定键对应的值
+        cout << str << endl;
+
+        //cout << umap.at("GO教程");  //执行此语句会抛出 out_of_range 异常
+        return 0;
+    }
+
+4) find成员方法查找: 成功返回指定元素迭代器, 失败返回最后一个键值对之后的位置
+#include <iostream>
+#include <string>
+#include <unordered_map>
+using namespace std;
+int main()
+{
+    //创建 umap 容器
+    unordered_map<string, string> umap
+    {
+        {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+        {"Java教程","http://www.cdsy.xyz/computer/programme/java/"},
+        {"Linux教程","http://www.cdsy.xyz/computer/system/linux/"} 
+    };
+    
+    unordered_map<string, string>::iterator iter = umap.find("Python教程");  //查找成功, 返回指定元素的迭代器
+    cout << iter->first << " " << iter->second << endl;
+    
+    unordered_map<string, string>::iterator iter2 = umap.find("GO教程");  //查找失败, 返回最后一个键值对之后的位置
+    if (iter2 == umap.end()) {
+        cout << "当前容器中没有以\"GO教程\"为键的键值对";
+    }
+    return 0;
+}
+
+
 ```  
 
  6. 无序容器实现机制 
+
+    参考: https://www.cdsy.xyz/computer/programme/stl/20210307/cd161510783312009.html
 
 
 ##### 2. TBD
