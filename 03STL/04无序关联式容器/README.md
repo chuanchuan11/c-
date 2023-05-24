@@ -210,21 +210,21 @@ c) insert 将某一个unordered_map 容器中指定区域内的所有键值对�
 
 d) insert 一次向 unordered_map 容器添加多个键值对
 
-#include <iostream>
-#include <string>
-#include <unordered_map>
-using namespace std;
-int main()
-{
-    unordered_map<string, string> umap;
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap;
 
-    //向 umap 容器同时添加多个键值对
-    umap.insert({ {"STL教程","http://www.cdsy.xyz/computer/programme/stl/"},
-                  {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
-                  {"Java教程","http://www.cdsy.xyz/computer/programme/java/"} 
-                });
-    return 0;
-}
+        //向 umap 容器同时添加多个键值对
+        umap.insert({ {"STL教程","http://www.cdsy.xyz/computer/programme/stl/"},
+                      {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+                      {"Java教程","http://www.cdsy.xyz/computer/programme/java/"} 
+                    });
+        return 0;
+    }
 
 注意: 
     (1) 需要注意的是，在操作 unordered_map 容器过程（尤其是向容器中添加新键值对）中，一旦当前容器的负载因子超过最大负载因子（默认值为 1.0）
