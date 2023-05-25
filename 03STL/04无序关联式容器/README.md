@@ -471,14 +471,41 @@ d) clear: 一次性删除 容器中所有键值对
     参考: https://www.cdsy.xyz/computer/programme/stl/20210307/cd161510783312009.html
 
 
-##### 2. TBD
+##### 2. unordered_multimap
 
 (0) 概述
-             
-(1) 创建
 
+    unordered_multimap 容器也以键值对形式存储数据，且底层也采用哈希表结构存储各个键值对。两者唯一的不同之处在于，unordered_multimap 容器可以存储多个键相等的键值对
+
+```
+1. unordered_multimap 容器模板的定义如下所示：
+    template < class Key,               //键（key）的类型
+               class T,                 //值（value）的类型
+               class Hash = hash<Key>,  //底层存储键值对时采用的哈希函数
+               class Pred = equal_to<Key>,                  //判断各个键值对的键相等的规则
+               class Alloc = allocator< pair<const Key,T> > // 指定分配器对象的类型
+               > class unordered_multimap;
+               
+    以上 5 个参数中，必须显式给前 2 个参数传值，且除极个别的情况外，最多只使用前 4 个参数，它们各自的含义和功能如表 1 所示
+```
+
+<img width="425" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/c5d22dee-beb4-4663-b9f5-933eecaaa20c">
+
+注意：当 unordered_multimap 容器中存储键值对的键为自定义类型时，默认的哈希函数 hash<key> 以及比较函数 equal_to<key> 将不再适用，这种情况下，需要我们自定义适用的哈希函数和比较函数，并分别显式传递给 Hash 参数和 Pred 参数
+
+```
+2. 头文件
+    #include <unordered_map>
+    using namespace std;
+```
+
+(1) 创建
+```
+1) 
+```
 (2) 常见成员函数
-             
+
+
 (3) 迭代器使用详解
 
 1. 遍历
