@@ -592,7 +592,7 @@ c) 已有容器初始化新容器
 
 d) 选择性元素初始化新容器
   
-   std::unordered_set<std::string> uset2(++uset.begin(),uset.end());
+   std::unordered_set<std::string> uset2(++uset.begin(),uset.end());  //传入迭代器，选择元素范围
 ```
 
 (2) 常见成员函数
@@ -607,45 +607,75 @@ d) 选择性元素初始化新容器
 
     增删改查参考常见成员函数
 
-##### 4. TBD
+##### 4. unordered_multiset容器
 
 (0) 概述
-             
+
+```
+1. unordered_multiset 容器大部分的特性都和 unordered_set 容器相同: 
+   
+   a) unordered_multiset 不以键值对的形式存储数据, 而是直接存储数据的值
+
+   b) 该类型容器底层采用的也是哈希表存储结构, 它不会对内部存储的数据进行排序
+
+   c) unordered_multiset 容器内部存储的元素, 其值不能被修改
+  
+2. 不同点
+  
+   unordered_multiset 容器可以同时存储多个值相同的元素
+  
+3. 头文件
+   #include <unordered_set>
+   using namespace std;
+
+4. unordered_multiset 容器类模板的定义如下
+   template < class Key,                    //容器中存储元素的类型
+              class Hash = hash<Key>,       //确定元素存储位置所用的哈希函数
+              class Pred = equal_to<Key>,   //判断各个元素是否相等所用的函数
+              class Alloc = allocator<Key>  //指定分配器对象的类型
+           > class unordered_multiset;
+
+   注意: 在 99% 的实际场景中，最多只需要使用前 3 个参数（各自含义如表 1 所示），最后一个参数保持默认值即可
+```
+
+<img width="424" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/c4f80223-11e0-4462-a907-ecef5d3e3a0c">
+
+注意: 如果 unordered_multiset 容器中存储的元素为自定义的数据类型，则默认的哈希函数 hash<key> 以及比较函数 equal_to<key> 将不再适用，只能自己设计适用该类型的哈希函数和比较函数，并显式传递给 Hash 参数和 Pred 参数
+  
 (1) 创建
 
+```
+a) 创建空的 unordered_multiset 容器
+  
+   std::unordered_multiset<std::string> umset;
+  
+b) 创建同时完成初始化  
+  
+    std::unordered_multiset<std::string> umset{ "http://www.cdsy.xyz/computer/programme/C_language/",
+                                                "http://www.cdsy.xyz/computer/programme/java/",
+                                                "http://www.cdsy.xyz/computer/system/linux/" 
+                                               };
+c) 已有容器初始化新容器
+
+    std::unordered_multiset<std::string> umset2(umset);  //拷贝构造函数, 如果是临时对象则调用移动构造函数
+  
+d) 选择性元素初始化
+
+    std::unordered_multiset<std::string> umset2(++umset.begin(), umset.end());  //传入两个迭代器，选择元素范围
+  
+```
+
 (2) 常见成员函数
-             
+
+<img width="427" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/ee19da63-d8a5-4016-8326-509ebc249044">
+
+<img width="427" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/490a01a6-7e21-40ff-870c-cbe0c8cbe9c1">
+
+注意，和 unordered_set 容器一样，unordered_multiset 模板类也没有重载 [ ] 运算符，没有提供 at() 成员方法。不仅如此，无论是由哪个成员方法返回的迭代器，都不能用于修改容器中元素的值
+
 (3) 迭代器使用详解
 
-1. 遍历
-
-```
-             
-```       
-
-2. 增
-
-```
-             
-```       
-
-3. 删
-
-```
-             
-```         
-             
- 4. 改
-
-```
-             
-```              
-  
- 5. 查
-
-```
-             
-``` 
+    增删改查参考常用成员函数
 
 
 
