@@ -278,7 +278,101 @@ f) emplace_hint方法: 成功返回指向新键值对得迭代器; 失败返回�
 3. 删
 
 ```
-             
+a) erase: 接受正向迭代器, 并删除迭代器指向得键值对
+
+    用法: 
+        iterator erase ( const_iterator position );   //position 为指向容器中某个键值对的迭代器, 返回被删除键值对之后位置得迭代器
+    实例: 
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap
+        {
+            {"STL教程", "http://www.cdsy.xyz/computer/programme/stl/"},
+            {"Python教程", "http://www.cdsy.xyz/computer/programme/Python/"},
+            {"Java教程", "http://www.cdsy.xyz/computer/programme/java/"} 
+        };
+
+        unordered_map<string,string>::iterator ret;  //定义一个接收 erase() 方法的迭代器
+        ret = umap.erase(umap.begin());  //删除容器中第一个键值对
+        cout << "ret = " << ret->first << " " << ret->second << endl;
+        return 0;
+    }
+    注意: 如果删除的是最后一个键值对，则返回容器中最后一个键值对之后的位置, 等同于end()方法
+
+b) erase：接受key值, 返回成功删除键值对的数量
+
+    用法：
+        size_type erase ( const key_type& k );
+    实例: 
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap
+        {
+            {"STL教程", "http://www.cdsy.xyz/computer/programme/stl/"},
+            {"Python教程", "http://www.cdsy.xyz/computer/programme/Python/"},
+            {"Java教程", "http://www.cdsy.xyz/computer/programme/java/"} 
+        }; 
+
+        int delNum = umap.erase("Python教程");
+        cout << "delNum = " << delNum << endl;
+        return 0;
+    }
+
+c) erase: 一次删除指定范围内的所有键值对, 返回被删除的最后一个键值对之后一个位置的迭代器
+
+    用法: 
+        iterator erase ( const_iterator first, const_iterator last );
+    实例:
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap
+        {
+            {"STL教程", "http://www.cdsy.xyz/computer/programme/stl/"},
+            {"Python教程", "http://www.cdsy.xyz/computer/programme/Python/"},
+            {"Java教程", "http://www.cdsy.xyz/computer/programme/java/"} 
+        };
+        //first 指向第一个键值对
+        unordered_map<string, string>::iterator first = umap.begin();
+        //last 指向最后一个键值对
+        unordered_map<string, string>::iterator last = --umap.end();
+        //删除[fist,last)范围内的键值对
+        auto ret = umap.erase(first, last);
+        cout << "ret -> " << ret->first << " " << ret->second << endl;
+        return 0;
+    } 
+
+d) clear: 一次性删除 容器中所有键值对
+
+    实例：
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap
+        {
+            {"STL教程", "http://www.cdsy.xyz/computer/programme/stl/"},
+            {"Python教程", "http://www.cdsy.xyz/computer/programme/Python/"},
+            {"Java教程", "http://www.cdsy.xyz/computer/programme/java/"} 
+        };
+        //删除容器内所有键值对
+        umap.clear();
+        cout << "umap size = " << umap.size() << endl;
+        return 0;
+    } 
 ```         
              
  4. 查与改
