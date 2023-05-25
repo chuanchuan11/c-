@@ -225,6 +225,46 @@ d) insert 一次向 unordered_map 容器添加多个键值对
                     });
         return 0;
     }
+    
+ /*********************************************/
+ /*emplace 方法和emplace_hint方法效率比insert高 */
+ /*********************************************/
+e) emplace方法: 成功返回新添加得键值对pair, bool为true；失败返回已经存在元素得键值对pair, bool为false
+
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap;
+        pair<unordered_map<string, string>::iterator, bool> ret; //定义一个接受 emplace() 方法的 pair 类型变量
+
+        ret = umap.emplace("STL教程", "http://www.cdsy.xyz/computer/programme/stl/"); //调用 emplace() 方法
+        //输出 ret 中包含的 2 个元素的值
+        cout << "bool =" << ret.second << endl;
+        cout << "iter ->" << ret.first->first << " " << ret.first->second << endl;
+        return 0;
+    }
+
+f) emplace_hint方法: 成功返回指向新键值对得迭代器; 失败返回已经存在键值对得迭代器
+
+    #include <iostream>
+    #include <string>
+    #include <unordered_map>
+    using namespace std;
+    int main()
+    {
+        unordered_map<string, string> umap;
+        unordered_map<string,string>::iterator iter;          //定义一个接受 emplace_hint() 方法的迭代器
+        
+        iter = umap.emplace_hint(umap.begin(),"STL教程", "http://www.cdsy.xyz/computer/programme/stl/");  //调用 empalce_hint() 方法
+        //输出 emplace_hint() 返回迭代器 iter 指向的键值对的内容
+        cout << "iter ->" << iter->first << " " << iter->second << endl;
+        return 0;
+    }
+
+
 
 注意: 
     (1) 需要注意的是，在操作 unordered_map 容器过程（尤其是向容器中添加新键值对）中，一旦当前容器的负载因子超过最大负载因子（默认值为 1.0）
@@ -233,7 +273,6 @@ d) insert 一次向 unordered_map 容器添加多个键值对
         
     (2) 所谓迭代器失效，针对的是那些用于表示容器内某个范围的迭代器，由于重哈希会重新调整每个键值对的存储位置，所以容器重哈希之后,
         之前表示特定范围的迭代器很可能无法再正确表示该范围。但是，重哈希并不会影响那些指向单个键值对元素的迭代器
- 
 ```       
 
 3. 删
@@ -242,13 +281,7 @@ d) insert 一次向 unordered_map 容器添加多个键值对
              
 ```         
              
- 4. 改
-
-```
-             
-```              
-  
- 5. 查
+ 4. 查与改
 
   建议首选at使用,[]容易出错
 
