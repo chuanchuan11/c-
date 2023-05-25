@@ -501,42 +501,37 @@ d) clear: 一次性删除 容器中所有键值对
 
 (1) 创建
 ```
-1) 
+1) 使用默认构造函数, 创建空的容器
+  
+   std::unordered_multimap<std::string, std::string> myummap; 
+  
+2) 创建同时进行初始化
+  
+  unordered_multimap<string, string>myummap
+  {
+    {"Python教程","http://www.cdsy.xyz/computer/programme/Python/"},
+    {"Java教程","http://www.cdsy.xyz/computer/programme/java/"},
+    {"Linux教程","http://www.cdsy.xyz/computer/system/linux/"} 
+  };
+ 
+3) 使用已有容器初始化新的容器, 调用拷贝构造函数
+  
+  unordered_multimap<string, string> myummap2(myummap);
+  
+4) 范围选择性初始化新容器
+  
+  std::unordered_multimap<std::string, std::string> myummap2(++myummap.begin(), myummap.end());    //传入 2 个迭代器
+  
 ```
 (2) 常见成员函数
 
+<img width="425" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/bd040546-6f70-4e5f-88b2-4378d2ac5b76">
+
+<img width="427" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/fa73fb97-9285-461c-90b1-98aa0db07cb4">
 
 (3) 迭代器使用详解
 
-1. 遍历
-
-```
-             
-```       
-
-2. 增
-
-```
-             
-```       
-
-3. 删
-
-```
-             
-```         
-             
- 4. 改
-
-```
-             
-```              
-  
- 5. 查
-
-```
-             
-``` 
+  增删改查基本与unordered_map一致, 只是unordered_multimap没有提供[]和at方法, 意味着该容器无法通过指定键获取值, 因为该容器允许相等的键存在
 
 ##### 3. TBD
 
