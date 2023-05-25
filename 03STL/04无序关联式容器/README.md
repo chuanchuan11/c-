@@ -534,45 +534,78 @@ d) clear: 一次性删除 容器中所有键值对
 
   增删改查基本与unordered_map一致, 只是unordered_multimap没有提供[]和at方法, 意味着该容器无法通过指定键获取值, 因为该容器允许相等的键存在
 
-##### 3. TBD
+##### 3. unordered_set容器
 
 (0) 概述
-             
+
+  unordered_set容器和 set 容器很像，唯一的区别就在于 set 容器会自行对存储的数据进行排序，而 unordered_set 容器不会
+  
+```
+1. unordered_set 容器具有以下几个特性:
+  
+    a) 不再以键值对的形式存储数据, 而是直接存储数据的值
+
+    b) 容器内部存储的各个元素的值都互不相等, 且不能被修改
+
+    c) 不会对内部存储的数据进行排序
+  
+注意: 不以键值对的形式存储数据, 理解为，为了节省存储空间，该类容器在实际存储时选择只存储每个键值对的值
+  
+2.头文件
+  #include <unordered_set>
+  using namespace std; 
+```
+
+  unordered_set 容器的类模板定义如下: 
+
+```
+  template < class Key,                    //容器中存储元素的类型
+             class Hash = hash<Key>,       //确定元素存储位置所用的哈希函数
+             class Pred = equal_to<Key>,   //判断各个元素是否相等所用的函数
+             class Alloc = allocator<Key>  //指定分配器对象的类型
+             > class unordered_set;
+  
+  以上 4 个参数中，只有第一个参数没有默认值，这意味着至少需要手动传递 1 个参数。事实上在 99% 的实际场景中最多只需要使用前 3 个参数，最后一个参数保持默认值即可
+```
+
+  <img width="427" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/b169d1ed-3c6c-4dc0-be47-202263fefda4">
+
+  注意：如果 unordered_set 容器中存储的元素为自定义的数据类型，则默认的哈希函数 hash<key> 以及比较函数 equal_to<key> 将不再适用，只能自己设计适用该类型的哈希函数和比较函数，并显式传递给 Hash 参数和 Pred 参数
+
 (1) 创建
 
+```
+a) 空的unordered_set容器
+  
+   std::unordered_set<std::string> uset; 
+ 
+b) 创建同时完成初始化
+
+   std::unordered_set<std::string> uset{ "http://www.cdsy.xyz/computer/programme/C_language/",
+                                         "http://www.cdsy.xyz/computer/programme/java/",
+                                         "http://www.cdsy.xyz/computer/system/linux/" 
+                                       };
+
+c) 已有容器初始化新容器
+  
+   std::unordered_set<std::string> uset2(uset);  //调用拷贝构造，如何是临时对象则调用移动构造函数
+
+d) 选择性元素初始化新容器
+  
+   std::unordered_set<std::string> uset2(++uset.begin(),uset.end());
+```
+
 (2) 常见成员函数
-             
+
+<img width="426" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/37b58c35-002c-4327-858d-5fb842cf9306">
+
+<img width="428" alt="image" src="https://github.com/chuanchuan11/cplus/assets/42632290/414f5bb8-dbd3-43ae-a2fd-742c97333e57">
+
+注意: 此容器模板类中没有重载 [ ] 运算符，也没有提供 at() 成员方法。不仅如此，由于 unordered_set 容器内部存储的元素值不能被修改，因此无论使用那个迭代器方法获得的迭代器，都不能用于修改容器中元素的值
+
 (3) 迭代器使用详解
 
-1. 遍历
-
-```
-             
-```       
-
-2. 增
-
-```
-             
-```       
-
-3. 删
-
-```
-             
-```         
-             
- 4. 改
-
-```
-             
-```              
-  
- 5. 查
-
-```
-             
-``` 
+    增删改查参考常见成员函数
 
 ##### 4. TBD
 
