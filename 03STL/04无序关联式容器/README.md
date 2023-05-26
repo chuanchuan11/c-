@@ -680,7 +680,104 @@ d) 选择性元素初始化
 
 ##### 5. 无序容器的哈希函数和比较规则
 
+1. 无序关联式容器中遗留得一个共性问题, 如何给无序容器自定义一个哈希函数和比较规则？
 
+```
+  默认的 hash<key> 哈希函数和 equal_to<key> 比较规则，它们仅适用于存储基本类型（比如 int、double、float、string 等）数据的无序容器, 
+如果无序容器存储的数据类型为自定义的结构体或类，则 STL 标准库提供的 hash<key> 和 equal_to<key> 将不再适用
 
+```
+
+2. C++无序容器自定义哈希函数
+  
+    无序容器以键值对的方式存储数据（unordered_set 和 unordered_multiset 容器可以看做存储的是键和值相等的键值对），且底层采用哈希表结构存储各个键值对。在此存储结构中，哈希函数的功能是根据各个键值对中键的值，计算出一个哈希值（本质就是一个整数），哈希表可以根据该值判断出该键值对具体的存储位
+
+    简单地理解哈希函数，它可以接收一个元素，并通过内部对该元素做再加工，最终会得出一个整形值并反馈回来。需要注意的是，哈希函数只是一个称谓，其本体并不是普通的函数形式，而是一个函数对象类。因此，如果我们想自定义个哈希函数，就需要自定义一个函数对象类
+
+```
+1) 例子, 假如有个person类: 
+    class Person {
+    public:
+        Person(string name, int age) :name(name), age(age) {};
+        string getName() const;
+        int getAge() const;
+    private:
+        string name;
+        int age;
+    };
+    string Person::getName() const {
+        return this->name;
+    }
+    int Person::getAge() const {
+        return this->age;
+    }
+  
+2) 创建存储 Person 类对象的 unordered_set 容器，考虑到为自定义的类型，因此默认的哈希函数不再适用，这时就需要以函数对象类的方式自定义一个哈希函数。比如：
+ 
+    class hash_fun {
+    public:
+        int operator()(const Person &A) const   //重载 ( ) 运算符时，其参数必须为 const 类型，且该方法也必须用 const 修饰
+        {    
+            return A.getAge();    //该哈希函数每接收一个 Person 类对象，都会返回该对象的 age 成员变量的值
+        }
+    };
+
+3) 创建unordered_set 容器时，将 hash_fun 作为参数传递给该容器模板类中的 Pred 参数
+  
+  std::unordered_set<Person, hash_fun> myset；
+
+  注意：此时创建的 myset 容器还无法使用，因为该容器使用的是默认的 std::equal_to<key> 比较规则，但此规则并不适用于该容器
+```
+ 
+3. C++无序容器自定义比较规则
+   
+```
+    和哈希函数一样，无论创建哪种无序容器，都需要为其指定一种可比较容器中各个元素是否相等的规则。
+
+    值得一提的是，默认情况下无序容器使用的 std::equal_to<key> 比较规则，其本质也是一个函数对象类，底层实现如下：
+  
+    template<class T>
+    class equal_to
+    {
+    public:   
+        bool operator()(const T& _Left, const T& _Right) const{
+            return (_Left == _Right);
+        }   
+    };
+  
+    该规则在底层实现过程中，直接用 == 运算符比较容器中任意 2 个元素是否相等，这意味着，如果容器中存储的元素类型，支持直接用 == 运算符比较是否相等，则该容器可以使用默认的 std::equal_to<key> 比较规则；反之，就不可以使用
+  
+1) 自定义比较规则, 有以下 2 种方式:
+  
+   a) 在类中重载==运算符, 使得 std::equal_to<key> 比较规则中使用的 == 运算符变得合法
+      
+      //在person类中重载==运算符
+      bool operator==(const Person &A, const Person &B)   //重载 == 运算符时，2 个参数必须用 const 修饰
+      {
+        return (A.getAge() == B.getAge());
+      }
+      
+      示例:
+           std::unordered_set<Person, hash_fun> myset{ {"zhangsan", 40},{"zhangsan", 40},{"lisi", 40},{"lisi", 30} };  
+      
+      结果: 只会存储 {"zhangsan", 40} 和 {"lisi", 30}, 因为前边3个对象根据比较规则是相等的
+
+   b) 以函数对象类的方式自定义比较规则, 完全丢弃默认比较规则
+  
+      //自定义函数对象类的比较规则
+      class mycmp 
+      {
+          public:
+              bool operator()(const Person &A, const Person &B) const {
+                  return (A.getName() == B.getName()) && (A.getAge() == B.getAge());
+              }
+      };
+  
+      示例:
+          std::unordered_set<Person, hash_fun, mycmp> myset{ {"zhangsan", 40},{"zhangsan", 40},{"lisi", 40},{"lisi", 30} };
+      结果: 
+          内部存有  {"zhangsan", 40}、{"lisi", 40} 和 {"lisi", 30}，因为基于比较规则，前两个对象是相等的
+```
+  
 ##### 6. 实际使用中，如何选择合适的STL容器
 
