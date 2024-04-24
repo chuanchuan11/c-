@@ -117,8 +117,8 @@ std::mutex mutex_;
 
 int main() {
     auto func1 = [](int k) {
-        // std::lock_guard<std::mutex> lock(mutex_);
-        std::unique_lock<std::mutex> lock(mutex_);  //动态解锁
+        // std::lock_guard<std::mutex> lock(mutex_); //只能自动解锁,效率高
+        std::unique_lock<std::mutex> lock(mutex_);  //自动解锁,也支持手动加解锁,常与条件变量一起使用
         for (int i = 0; i < k; ++i) {
             cout << i << " ";
         }
